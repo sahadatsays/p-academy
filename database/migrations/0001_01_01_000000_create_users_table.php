@@ -11,12 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('zt_users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('username')->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->longText('permissions')->nullable();
+            $table->boolean('activated')->default(0);
+			$table->string('activation_code')->nullable()->index();
+			$table->string('activated_at')->nullable();
+			$table->string('last_login')->nullable();
+			$table->string('first_name')->nullable();
+			$table->string('last_name')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

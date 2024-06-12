@@ -64,4 +64,50 @@ class User extends Authenticatable
     public function name() {
         return $this->last_name . ' ' . $this->first_name;
     }
+
+        /**
+     * @return mixed
+     */
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class, 'zt_users_groups', 'user_id', 'group_id')->withPivot('ending_at', 'plan', 'sub_id');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isRoot()
+    {
+        return $this->groups()->where('group_id', '=', 1)->get()->count() > 0;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isAdmin()
+    {
+
+        return $this->groups()->where('group_id', '=', 2)->get()->count() > 0;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isPremium()
+    {
+        return $this->groups()->where('group_id', '=', 3)->orWhere('group_id', '=', 4)->orWhere('group_id', '=', 5)->get()->count() > 0;
+    }
+
+    /**
+     * @param $group
+     * @return mixed
+     */
+    public function inGroup($group)
+    {
+        if (gettype($group) == 'integer') {
+            return $this->groups()->where('zt_groups.id', '=', $group)->count();
+        } else {
+            return $this->groups()->where('lower(zt_groups.name)', '=', strtolower($group))->count();
+        }
+    }
 }

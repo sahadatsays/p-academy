@@ -18,6 +18,9 @@ class CreateUsersGroupsTable extends Migration {
 			$table->increments('id');
 			$table->integer('user_id')->unsigned();
 			$table->integer('group_id')->unsigned();
+            $table->date('ending_at')->nullable();
+            $table->string('plan')->nullable();
+            $table->string('sub_id')->nullable();
             $table->timestamps();
 		});
 	}

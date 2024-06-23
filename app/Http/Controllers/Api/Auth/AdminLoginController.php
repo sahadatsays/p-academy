@@ -42,6 +42,6 @@ class AdminLoginController extends ApiController
             return $this->sendResponse($response, 'User login successfully.');
         }
 
-        return $this->sendError('Unauthorised.', ['error' => 'Unauthorised']);
+        return $this->sendError('Wrong credentials.', ['error' => 'The provided credentials do not match our records.']);
     }
 }

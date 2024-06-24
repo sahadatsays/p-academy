@@ -13,8 +13,12 @@ Route::group(['prefix' => 'admin'], function () {
             return new UserResource($request->user());
         });
 
-        Route::resource('members', App\Http\Controllers\Api\AdminMemberController::class)->except(['edit', 'create']);
-        Route::resource('tournament', App\Http\Controllers\Api\AdminTournamentController::class);
+        Route::resource('members', App\Http\Controllers\Api\AdminMemberController::class)->except(['edit', 'create', 'store', 'destroy']);
+        Route::resource('tournaments', App\Http\Controllers\Api\AdminTournamentController::class)->except(['create', 'edit', 'destroy', 'show']);
+        Route::resource('orders', App\Http\Controllers\Api\AdminOrderController::class)->except(['create', 'edit', 'destroy', 'show']);
+        Route::resource('affiliations', App\Http\Controllers\Api\AdminAffiliationController::class)->except(['create', 'edit', 'destroy', 'show']);
+        Route::resource('users', App\Http\Controllers\Api\AdminUserController::class)->except(['create', 'edit', 'destroy', 'show']);
+        Route::resource('articles', App\Http\Controllers\Api\AdminArticleController::class)->except(['create', 'edit', 'destroy', 'show']);
     });
 });
 

@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Membre extends Model
 {
-    public $timestamps = true;
     protected $table = 'pa_membres';
     public $incrementing = false;
     public $guarded = ['id'];
@@ -22,17 +21,17 @@ class Membre extends Model
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'id')->withDefault();
     }
 
     /**
-     * Get all of the commandes for the Membre
+     * Get all of the orders for the Membre
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function commandes(): HasMany
+    public function orders(): HasMany
     {
-        return $this->hasMany(Commande::class, 'user_id');
+        return $this->hasMany(Order::class, 'user_id');
     }
 
     /**

@@ -7,9 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Affiliation extends Model
 {
-    public $timestamps = true;
     protected $table = 'pa_affiliations';
-    protected $guarded = array('id');
+    protected $guarded = ['id'];
 
     /**
      * Get the user that owns the Affiliation
@@ -22,11 +21,11 @@ class Affiliation extends Model
     }
 
     /**
-     * Get the membre that owns the Affiliation
+     * Get the member that owns the Affiliation
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function membre()
+    public function member()
     {
         return $this->belongsTo(Membre::class, 'user_id');
     }

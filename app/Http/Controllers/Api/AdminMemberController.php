@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Resources\MemberResource;
+use App\Models\Membre;
+use App\Models\Operator;
 use App\Models\TransfertPpa;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -20,18 +22,13 @@ class AdminMemberController extends ApiController
         $sortField = $request->input('sort_by', 'created_at');
         $sortOrder = $request->input('sort_order', 'desc');
 
-        $query = User::leftJoin('zt_v_groups_by_userid', 'zt_users.id', '=', 'zt_v_groups_by_userid.user_id')
-            ->leftJoin('pa_membres', 'zt_users.id', '=', 'pa_membres.id')
-            ->leftJoin('zt_users_metadata', 'zt_users.id', '=', 'zt_users_metadata.user_id')
-            ->select(array(
-                'zt_users.id', 'zt_users.token', 'zt_users.username', 'zt_users.first_name', 'zt_users.last_name', DB::Raw('concat(zt_users.first_name," ",zt_users.last_name) as name'),
-                'zt_users.email', 'pa_membres.ppa', 'zt_v_groups_by_userid.lesgroupes', 'zt_users.activated', 'zt_users.created_at', 'zt_users.last_activity'
-            ));
+        $query = Membre::query();
+
         // sorting query
         $query = $query->orderBy($sortField, $sortOrder);
 
         // Pagination
-        $members = $query->paginate($perPage);
+        $members = $query->with('user')->paginate($perPage);
 
         return MemberResource::collection($members);
     }
@@ -58,16 +55,8 @@ class AdminMemberController extends ApiController
     public function show(string $id)
     {
         try {
-            $user = User::leftJoin('zt_v_groups_by_userid', 'zt_users.id', '=', 'zt_v_groups_by_userid.user_id')
-                ->leftJoin('pa_membres', 'zt_users.id', '=', 'pa_membres.id')
-                ->leftJoin('zt_users_metadata', 'zt_users.id', '=', 'zt_users_metadata.user_id')
-                ->select(array(
-                    'zt_users.id', 'zt_users.token', 'zt_users.first_name', 'zt_users.last_name', 'zt_users.username', DB::Raw('concat(zt_users.first_name," ",zt_users.last_name) as name'),
-                    'zt_users.email', 'pa_membres.ppa', 'zt_v_groups_by_userid.lesgroupes', 'zt_users.activated', 'zt_users.created_at', 'zt_users.last_activity'
-                ))
-                ->where('zt_users.id', $id)
-                ->firstOrFail();
-            return new MemberResource($user);
+            $member = Membre::findOrFail($id);
+            return new MemberResource($member);
         } catch (ModelNotFoundException $th) {
             return $this->sendError($th->getMessage(), $th->getCode());
         }

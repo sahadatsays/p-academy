@@ -6,21 +6,20 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Tournament extends Model
+class Order extends Model
 {
     use HasFactory;
 
-    protected $table = 'pa_tournois';
-
+    protected $table = 'pa_commandes';
     protected $guarded = ['id'];
 
     /**
-     * Get the operator that owns the Tournament
+     * Get the member that owns the Order
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function operator(): BelongsTo
+    public function member(): BelongsTo
     {
-        return $this->belongsTo(Operator::class, 'operateur');
+        return $this->belongsTo(Membre::class, 'user_id');
     }
 }

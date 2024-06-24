@@ -27,17 +27,17 @@ class Article extends Model
 
     public function urlsite()
     {
-        return $this->morphOne('\Kelio\Zetatori\Urlsite', 'linkto');
+        return $this->morphOne(Urlsite::class, 'linkto');
     }
 
     public function comments()
     {
-        return $this->HasMany('\Kelio\Zetatori\Comment');
+        return $this->HasMany(Comment::class);
     }
 
     public function tags()
     {
-        return $this->belongsToMany('\Kelio\Zetatori\Tag', 'zt_tags_articles', 'article_id', 'tag_id');
+        return $this->belongsToMany(Tag::class, 'zt_tags_articles', 'article_id', 'tag_id');
     }
 
 

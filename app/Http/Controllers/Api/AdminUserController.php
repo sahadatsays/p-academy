@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Requests\TournamentRequest;
-use App\Http\Resources\TournamentResource;
-use App\Models\Tournament;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
+use App\Models\User;
 use Illuminate\Http\Request;
 
-class AdminTournamentController extends ApiController
+class AdminUserController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,15 +18,15 @@ class AdminTournamentController extends ApiController
         $sortField = $request->input('sort_by', 'id');
         $sortOrder = $request->input('sort_order', 'desc');
 
-        $query = Tournament::query();
+        $query = User::query();
 
         // sorting query
         $query = $query->orderBy($sortField, $sortOrder);
 
         // Pagination
-        $tournaments = $query->paginate($perPage);
+        $users = $query->paginate($perPage);
 
-        return TournamentResource::collection($tournaments);
+        return UserResource::collection($users);
     }
 
     /**
@@ -40,14 +40,9 @@ class AdminTournamentController extends ApiController
     /**
      * Store a newly created resource in storage.
      */
-    public function store(TournamentRequest $request)
+    public function store(Request $request)
     {
-        $data = $request->validated();
-        unset($data['heure_fin_submit']);
-        unset($data['heure_debut_submit']);
-
-        $tournament = Tournament::create($data);
-        return $this->sendResponse(new TournamentResource($tournament), 'Le tournoi a été ajouté!');
+        //
     }
 
     /**
@@ -69,15 +64,9 @@ class AdminTournamentController extends ApiController
     /**
      * Update the specified resource in storage.
      */
-    public function update(TournamentRequest $request, string $id)
+    public function update(Request $request, string $id)
     {
-        try {
-            $tournament = Tournament::findOrFail($id);
-            $tournament->update($request->validated());
-            return $this->sendResponse(new TournamentResource($tournament), 'Le tournoi a été modifié!');
-        } catch (\Throwable $th) {
-            return $this->sendError($th->getMessage());
-        }
+        //
     }
 
     /**

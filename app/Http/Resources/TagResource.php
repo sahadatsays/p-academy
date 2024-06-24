@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Http\Resources;
+
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class TagResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        return [
+            'id'            => $this->id,
+            'name'          => $this->name,
+            'type'          => $this->type,
+            'viewName'     => $this->view_name,
+            'indexPage'     => $this->index_page,
+            'createdAt'     => Carbon::parse($this->created_at)->toDateTimeString(),
+            'updatedAt'     => Carbon::parse($this->updated_at)->toDateTimeString(),
+            'parent'        => new TagResource($this->parent)
+        ];
+    }
+}

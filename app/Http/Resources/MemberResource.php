@@ -16,16 +16,25 @@ class MemberResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'username' => $this->username,
-            'name' => $this->name,
-            'email' => $this->email,
-            'groupes' => [],
-            'activated' => $this->activated ? true : false,
-            'createdAt' => Carbon::parse($this->created_at)->toDateString(),
-            'lastActivity' => Carbon::parse($this->last_activity)->toDateString(),
-            'firstName' => $this->first_name,
-            'lastName' => $this->last_name
+            'id'            => $this->id,
+            'user'          => $this->user != null ? new UserResource($this->user) : null,
+            'sex'           => $this->sexe,
+            'avatar'        => $this->avatar,
+            'birthDate'     => $this->naissance,
+            'phone'         => $this->tel,
+            'addressFirst'  => $this->add1,
+            'addressSecond' => $this->add2,
+            'postCode'      => $this->codepostal,
+            'city'          => $this->ville,
+            'country'       => $this->pays,
+            'ppa'           => $this->ppa,
+            'pevbc'         => $this->pevbc,
+            'punibet'       => $this->punibet,
+            'web'           => $this->web,
+            'skype'         => $this->skype,
+            'gplus'         => $this->gplus,
+            'urlSignup'    => $this->url_signup,
+            'createdAt'    => Carbon::parse($this->created_at)->toDateTimeString(),
         ];
     }
 }

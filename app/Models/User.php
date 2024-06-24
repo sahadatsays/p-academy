@@ -22,20 +22,9 @@ class User extends Authenticatable
     protected $table = 'zt_users';
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    // protected $fillable = [
-    //     'name',
-    //     'email',
-    //     'password',
-    // ];
-
-    /**
      * @var array
      */
-    protected $guarded = array('id');
+    protected $guarded = ['id'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -89,7 +78,6 @@ class User extends Authenticatable
      */
     public function isAdmin()
     {
-
         return $this->groups()->where('group_id', '=', 2)->get()->count() > 0;
     }
 

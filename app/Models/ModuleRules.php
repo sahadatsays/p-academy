@@ -5,10 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TransfertPpa extends Model
+class ModuleRules extends Model
 {
     use HasFactory;
 
-    protected $table = 'pa_transferts_ppa';
+    protected $table = 'zt_modules_rules';
     protected $guarded = ['id'];
+
+
+    public function module()
+    {
+        return $this->belongsTo(Module::class);
+    }
 }

@@ -3,17 +3,36 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use DB;
 use App\Models\Video;
 use App\Models\Coach;
 use App\Models\Tournoi;
 use Cocur\Slugify\Slugify;
+use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Support\Facades\DB;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Article extends Model
+class Article extends Model implements HasMedia
 {
+    use InteractsWithMedia, Sluggable;
+
     protected $table = 'zt_articles';
 
-    protected $guarded = array();
+    protected $guarded = ['id'];
+
+    /**
+     * Return the sluggable configuration array for this model.
+     *
+     * @return array
+     */
+    public function sluggable(): array
+    {
+        return [
+            'slug' => [
+                'source' => 'title'
+            ]
+        ];
+    }
 
     /**
      * Get the user that owns the Article
@@ -154,7 +173,7 @@ class Article extends Model
             elseif (isset($tagtransFR->title))
                 array_unshift($tree, $tagtransFR->slug);
             else
-                array_unshift($tree, slug($tag->name, '-'));
+                array_unshift($tree, str()->slug($tag->name, '-'));
         }
         if ($tag->parent_id != 0)
             $tree = $this->buildTreetag($tree, $tag->parent_id, $lang);

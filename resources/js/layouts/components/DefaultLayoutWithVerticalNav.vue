@@ -70,7 +70,7 @@ watch([
 
     <!-- 👉 Footer -->
     <template #footer>
-      <Footer />
+      <!-- <Footer /> -->
     </template>
 
     <!-- 👉 Customizer -->

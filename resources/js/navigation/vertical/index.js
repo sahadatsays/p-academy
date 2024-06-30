@@ -10,7 +10,7 @@ export default [
     children: [
       {
         title: 'Membres',
-        to: '',
+        to: { name: 'members' },
       },
       {
         title: 'Affiliations',

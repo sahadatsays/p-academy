@@ -44,6 +44,7 @@ export default defineConfig({
       styles: {
         configFile: 'resources/styles/variables/_vuetify.scss',
       },
+      autoImport: true,
     }), // Docs: https://github.com/johncampionjr/vite-plugin-vue-layouts#vite-plugin-vue-layouts
     Layouts({
       layoutsDirs: './resources/js/layouts/',

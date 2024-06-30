@@ -24,9 +24,10 @@ class UserResource extends JsonResource
             'email'     =>  $this->email,
             'groupes' => GroupResource::collection($this->groups),
             'activated' => $this->activated ? true : false,
-            'createdAt' => Carbon::parse($this->created_at)->toDateTimeString(),
-            'lastActivity' => Carbon::parse($this->last_activity)->toDateTimeString(),
-            'lastLogin' => Carbon::parse($this->last_login)->toDateTimeString(),
+            'activatedAt' => $this->activated_at != null ? Carbon::parse($this->activated_at)->toDateTimeString() : null,
+            'createdAt' => $this->created_at != null ? Carbon::parse($this->created_at)->toDateTimeString() : null,
+            'lastActivity' => $this->last_activity != null ? Carbon::parse($this->last_activity)->toDateTimeString() : null,
+            'lastLogin' => $this->last_login != null ? Carbon::parse($this->last_login)->toDateTimeString() : null,
         ];
     }
 }

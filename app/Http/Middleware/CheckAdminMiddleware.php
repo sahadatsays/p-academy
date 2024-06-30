@@ -18,7 +18,7 @@ class CheckAdminMiddleware
     {
         if (!Auth::guard('api')->check() && !auth()->user()->isAdmin() && !auth()->user()->isRoot()) {
             if ($request->expectsJson()) {
-                return response('Unauthorized.', 401);
+                return response('Unauthorized Access.', 401);
             }
             return redirect('login');
         }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\QueryHelper;
 use App\Http\Resources\MemberResource;
 use App\Models\Membre;
 use App\Models\Operator;
@@ -18,19 +19,54 @@ class AdminMemberController extends ApiController
      */
     public function index(Request  $request)
     {
-        $perPage = $request->input('per_page', 15);
-        $sortField = $request->input('sort_by', 'created_at');
-        $sortOrder = $request->input('sort_order', 'desc');
+        $perPage = $request->input('itemsPerPage', 25);
 
-        $query = Membre::query();
+        $query = Membre::query()
+            ->join('zt_users', 'pa_membres.id', '=', 'zt_users.id')
+            ->select('zt_users.id as userid', 'pa_membres.*');
 
         // sorting query
-        $query = $query->orderBy($sortField, $sortOrder);
+        if ($request->get('sortBy')) {
+            $sortBy = json_decode($request->get('sortBy'));
+            $query = $this->sortBy($query, $sortBy->key, $sortBy->order);
+        }
+
+        // search
+        if ($request->has('search')) {
+            $search = $request->get('search');
+            $columns = ['zt_users.id', 'zt_users.username', 'zt_users.email', 'zt_users.first_name', 'zt_users.last_name'];
+            $query = QueryHelper::searchAll($query, $search, $columns);
+        }
 
         // Pagination
         $members = $query->with('user')->paginate($perPage);
 
         return MemberResource::collection($members);
+    }
+
+    private function sortBy($query, $key, $order)
+    {
+
+        if ($key == 'user.username') {
+            return $query->orderBy('username', $order);
+        }
+
+        if ($key == 'user.name') {
+            return $query->orderBy('first_name', $order);
+        }
+
+        if ($key == 'user.email') {
+            return $query->orderBy('email', $order);
+        }
+
+        if ($key == 'user.createdAt') {
+            return $query->orderBy('created_at', $order);
+        }
+
+        if ($key == 'user.activatedAt') {
+            return $query->orderBy('activated_at', $order);
+        }
+        return $query->orderBy($key, $order);
     }
 
     /**

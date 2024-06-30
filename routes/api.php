@@ -1,15 +1,14 @@
 <?php
 
-use App\Http\Controllers\Api\AdminMemberController;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::group(['prefix' => 'admin'], function () {
+Route::group(['prefix' => 'admin', 'middleware' => 'api'], function () {
     Route::post('login', [App\Http\Controllers\Api\Auth\AdminAuthController::class, 'login'])->name('login');
 
     Route::group(['middleware' => ['auth:api', 'checkAdmin']], function () {
-        Route::post('logout', [App\Http\Controllers\Api\Auth\AdminAuthController::class, 'logout'])->name('logout');
+        Route::post('logout', [App\Http\Controllers\Api\Auth\AdminAuthController::class, 'logout'])->name('api.logout');
         
         Route::get('user', function (Request $request) {
             return new UserResource($request->user());

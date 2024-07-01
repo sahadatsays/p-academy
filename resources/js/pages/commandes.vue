@@ -1,14 +1,8 @@
 <script setup>
-const options = ref({
-  id: '',
-  username: '',
-  name: '',
-  email: '',
-  activated: '',
-})
+const options = ref({})
 
-const affiliations = ref([])
-const totalMembers = ref(0)
+const orderList = ref([])
+const totalOrders = ref(0)
 const loading = ref(false)
 const perPage = ref(0)
 const search = ref('')
@@ -20,49 +14,39 @@ const headers = [
     key: 'id',
   },
   {
-    title: 'Username',
-    key: 'user.username',
+    title: 'Lib',
+    key: 'lib',
   },
   {
-    title: 'nom',
-    key: 'user.name',
+    title: 'Price',
+    key: 'prix',
+  },
+  {
+    title: 'User ID',
+    key: 'user_id',
+  },
+  {
+    title: 'Username',
+    key: 'username',
   },
   {
     title: 'Email',
-    key: 'user.email',
+    key: 'email',
   },
   {
-    title: 'PPA',
-    key: 'ppa',
+    title: 'Payment',
+    key: 'paiement',
   },
   {
-    title: 'Groupe',
-    key: 'user.group',
-    sortable: false,
-  },
-  {
-    title: 'activé',
-    key: 'activated',
-  },
-  {
-    title: 'crée le',
-    key: 'user.createdAt',
-  },
-  {
-    title: 'actif le',
-    key: 'user.activatedAt',
-  },
-  {
-    title: '#',
-    key: 'actions',
-    sortable: false,
+    title: 'Date',
+    key: 'date',
   },
 ]
 
 const fetchMembers = async () => {
   loading.value = true
 
-  const response = await $api('/admin/members', {
+  const response = await $api('/admin/orders', {
     query: options.value,
     onResponseError({ response }) {
       console.log(response)
@@ -70,8 +54,8 @@ const fetchMembers = async () => {
   })
 
   // assign Response
-  memberList.value = response.data 
-  totalMembers.value = response.meta.total
+  orderList.value = response.data 
+  totalOrders.value = response.meta.total
   perPage.value = response.meta.per_page
   loading.value = false
 }
@@ -109,10 +93,10 @@ watch(options, fetchMembers, { deep: true })
         :search="search"
         :items-per-page="perPage"
         :headers="headers"
-        :items="memberList"
+        :items="orderList"
         loading-text="Loading... Please wait"
         :loading="loading"
-        :items-length="totalMembers"
+        :items-length="totalOrders"
         class="text-no-wrap"
       >
         <template #body.prepend>
@@ -126,8 +110,34 @@ watch(options, fetchMembers, { deep: true })
                 hide-details
                 dense
                 outlined
+                placeholder="ID"
                 style="width: 5rem;"
               /> 
+            </td>
+            <td>
+              <AppTextField 
+                v-model="options.lib"
+                append-inner-icon="tabler-search"
+                density="compact"
+                single-line
+                hide-details
+                dense
+                outlined
+                placeholder="Lib"
+              />
+            </td>
+            <td />
+            <td>
+              <AppTextField 
+                v-model="options.user_id"
+                append-inner-icon="tabler-search"
+                density="compact"
+                single-line
+                hide-details
+                dense
+                outlined
+                placeholder="ID"
+              />
             </td>
             <td>
               <AppTextField 
@@ -138,78 +148,43 @@ watch(options, fetchMembers, { deep: true })
                 hide-details
                 dense
                 outlined
-              />
-            </td>
-            <td>
-              <AppTextField 
-                v-model="options.name"
-                density="compact"
-                append-inner-icon="tabler-search"
-                single-line
-                hide-details
-                dense
-                outlined
+                placeholder="Username"
               />
             </td>
             <td>
               <AppTextField 
                 v-model="options.email"
-                density="compact"
                 append-inner-icon="tabler-search"
+                density="compact"
                 single-line
                 hide-details
                 dense
                 outlined
-              />
-            </td>
-            <td colspan="2" />
-            <td>
-              <AppSelect
-                v-model="options.activated"
-                :items="['None', 'Active', 'Inactive']"
-                density="compact"
-                placeholder="Select"
-                item-title="title"
-                item-value="value"
-                style="width: 5rem;"
+                placeholder="Email"
               />
             </td>
             <td colspan="3" />
           </tr>
         </template>
-        <template #item.user.group="{ item }">
+
+        <!-- User ID -->
+        <template #item.user_id="{ item }">
           <div class="d-flex align-center">
-            <div 
-              v-for="group in item.user.groupes" 
-              :key="group.id" 
-              class="d-flex flex-column ms-3"
-            >
-              <VChip label>
-                {{ group.name }}
-              </VChip>
-            </div>
+            {{ item.user.id }}
           </div>
         </template>
-        <!-- activated -->
-        <template #item.activated="{ item }">
+
+        <!-- User ID -->
+        <template #item.username="{ item }">
           <div class="d-flex align-center">
-            <VChip v-if="item.user.activated">
-              <VIcon icon="tabler-circle-check text-2xl" />
-            </VChip>
+            {{ item.user.username }}
           </div>
         </template>
-        <!-- actions -->
-        <template #item.actions="{ item }">
+
+        <!-- User Email -->
+        <template #item.email="{ item }">
           <div class="d-flex align-center">
-            <IconBtn>
-              <VIcon icon="tabler-external-link" />
-            </IconBtn>
-            <IconBtn>
-              <VIcon icon="tabler-pencil" />
-            </IconBtn>
-            <IconBtn>
-              <VIcon icon="tabler-user-filled" />
-            </IconBtn>
+            {{ item.user.email }}
           </div>
         </template>
       </VDataTableServer>

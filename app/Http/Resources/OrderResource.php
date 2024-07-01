@@ -19,7 +19,7 @@ class OrderResource extends JsonResource
             'id'            => $this->id,
             'lib'           => $this->lib,
             'prix'          => $this->prix,
-            'user'          => new MemberResource($this->member),
+            'user'          => new UserResource($this->user),
             'paiement'      => $this->paiement,
             'date'          => Carbon::parse($this->created_at)->toDateTimeString()
         ];

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\QueryHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
@@ -14,19 +15,90 @@ class AdminOrderController extends ApiController
      */
     public function index(Request $request)
     {
-        $perPage = $request->input('per_page', 15);
-        $sortField = $request->input('sort_by', 'id');
-        $sortOrder = $request->input('sort_order', 'desc');
+        $perPage = $request->input('itemsPerPage', 15);
 
-        $query = Order::query();
+        $query = Order::query()
+            ->join('zt_users', 'pa_commandes.user_id', '=', 'zt_users.id')
+            ->select('zt_users.id as user_id', 'pa_commandes.*');
 
-         // sorting query
-         $query = $query->orderBy($sortField, $sortOrder);
+        // sorting query
+        if ($request->get('sortBy')) {
+            $sortBy = json_decode($request->get('sortBy'));
+            $query = $this->sortBy($query, $sortBy->key, $sortBy->order);
+        }
 
-         // Pagination
-         $orders = $query->with('member')->paginate($perPage);
+        // filters by columns
+        $query = $this->filters($query, $request);
 
-         return OrderResource::collection($orders);
+        // search
+        if ($request->has('search')) {
+            $search = $request->get('search');
+            $columns = ['lib'];
+            $query = QueryHelper::searchAll($query, $search, $columns);
+        }
+
+        // Pagination
+        $orders = $query->with('member')->paginate($perPage);
+
+        return OrderResource::collection($orders);
+    }
+
+    private function sortBy($query, $key, $order)
+    {
+        if ($key == 'id') {
+            return $query->orderBy('id', $order);
+        }
+
+        if ($key == 'lib') {
+            return $query->orderBy('lib', $order);
+        }
+
+        if ($key == 'prix') {
+            return $query->orderBy('prix', $order);
+        }
+
+        if ($key == 'user_id') {
+            return $query->orderBy('zt_users.id', $order);
+        }
+
+        if ($key == 'username') {
+            return $query->orderBy('zt_users.username', $order);
+        }
+        if ($key == 'email') {
+            return $query->orderBy('zt_users.email', $order);
+        }
+
+        if ($key == 'paiement') {
+            return $query->orderBy('paiement', $order);
+        }
+
+        if ($key == 'date') {
+            return $query->orderBy('date', $order);
+        }
+        return $query->orderBy($key, $order);
+    }
+
+    private function filters($query, $request)
+    {
+        if ($request->get('id')) {
+            $query->where('id', $request->id);
+        }
+
+        if ($request->get('lib')) {
+            $query->where('lib', 'LIKE', '%' . $request->lib . '%');
+        }
+
+        if ($request->get('user_id')) {
+            $query->where('zt_users.id', $request->user_id);
+        }
+        if ($request->get('username')) {
+            $query->where('zt_users.username', 'LIKE', '%'. $request->username . '%');
+        }
+        if ($request->get('email')) {
+            $query->where('zt_users.email', 'LIKE', '%'. $request->email . '%');
+        }
+
+        return $query;
     }
 
     /**

@@ -1,11 +1,5 @@
 <script setup>
-const options = ref({
-  id: '',
-  username: '',
-  name: '',
-  email: '',
-  activated: '',
-})
+const options = ref({})
 
 const affiliations = ref([])
 const totalAffiliations = ref(0)

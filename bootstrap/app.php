@@ -14,6 +14,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // [SETUP HERE] Adminer Middleware group
+        $middleware->group('adminer', [
+            \Illuminate\Cookie\Middleware\EncryptCookies::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+            \Illuminate\Auth\Middleware\Authenticate::class,
+        ]);
+        
         $middleware->api(prepend:[
             \App\Http\Middleware\DefaultApiAcceptHeader::class,
         ]);

@@ -11,6 +11,8 @@
         "laravel/passport": "^12.2",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
+        "onecentlin/laravel-adminer": "^7.0",
+        "rap2hpoutre/laravel-log-viewer": "^2.4",
         "spatie/laravel-medialibrary": "^11.7"
     },
     "require-dev": {

@@ -61,4 +61,25 @@ export default [
     to: '',
     icon: { icon: 'tabler-users' },
   },
+  {
+    title: 'System',
+    icon: { icon: 'tabler-settings-star' },
+    children: [
+      {
+        title: 'Logs Laravel',
+        href: '/logs',
+        target: '__blank',
+      },
+      {
+        title: 'BDD',
+        href: '/adminer',
+        target: '__blank',
+      },
+      {
+        title: 'PHP Info',
+        href: '/phpinfo',
+        target: '__blank',
+      },
+    ],
+  },
 ]

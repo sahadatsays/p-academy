@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\QueryHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AffiliationResource;
 use App\Models\Affiliation;
@@ -14,19 +15,80 @@ class AdminAffiliationController extends Controller
      */
     public function index(Request $request)
     {
-        $perPage = $request->input('per_page', 15);
-        $sortField = $request->input('sort_by', 'created_at');
-        $sortOrder = $request->input('sort_order', 'desc');
+        $perPage = $request->input('itemsPerPage', 15);
 
-        $query = Affiliation::query();
+        $query = Affiliation::query()
+            ->join('zt_users', 'pa_affiliations.user_id', '=', 'zt_users.id');
 
         // sorting query
-        $query = $query->orderBy($sortField, $sortOrder);
+        if ($request->get('sortBy')) {
+            $sortBy = json_decode($request->get('sortBy'));
+            $query = $this->sortBy($query, $sortBy->key, $sortBy->order);
+        }
+
+        // filters by columns
+        $query = $this->filters($query, $request);
+
+        // search
+        if ($request->has('search')) {
+            $search = $request->get('search');
+            $columns = ['zt_users.id', 'zt_users.username', 'room', 'pseudo_room', 'statut'];
+            $query = QueryHelper::searchAll($query, $search, $columns);
+        }
 
         // Pagination
-        $affiliation = $query->with('user')->paginate($perPage);
+        $affiliation = $query->paginate($perPage);
 
         return AffiliationResource::collection($affiliation);
+    }
+
+    private function sortBy($query, $key, $order)
+    {
+
+        if ($key == 'userid') {
+            return $query->orderBy('zt_users.id', $order);
+        }
+
+        if ($key == 'username') {
+            return $query->orderBy('zt_users.username', $order);
+        }
+
+        if ($key == 'user.createdAt') {
+            return $query->orderBy('zt_users.created_at', $order);
+        }
+
+        if ($key == 'pseudo_room') {
+            return $query->orderBy('pseudo_room', $order);
+        }
+
+        if ($key == 'status') {
+            return $query->orderBy('statut', $order);
+        }
+        return $query->orderBy($key, $order);
+    }
+
+    private function filters($query, $request)
+    {
+        if ($request->get('userid')) {
+            $query->where('zt_users.id', $request->userid);
+        }
+
+        if ($request->get('room')) {
+            $query->where('room', 'LIKE', '%' . $request->room . '%');
+        }
+
+        if ($request->get('pseudo_room')) {
+            $query->where('pseudo_room', 'LIKE', '%' . $request->pseudo_room . '%');
+        }
+
+        if ($request->get('status')) {
+            $query->where('statut', 'LIKE', '%' . $request->status . '%');
+        }
+
+        if ($request->get('username')) {
+            $query->where('zt_users.username', 'LIKE', '%' . $request->username . '%');
+        }
+        return $query;
     }
 
     /**

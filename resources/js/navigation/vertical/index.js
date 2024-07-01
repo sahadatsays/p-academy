@@ -14,15 +14,15 @@ export default [
       },
       {
         title: 'Affiliations',
-        to: '',
+        to: { name: 'affiliations' },
       },
       {
         title: 'Commandes',
-        to: '',
+        to: { name: 'commandes' },
       },
       {
         title: 'Tournois',
-        to: '',
+        to: { name: 'tournois' },
       },
     ],
   },

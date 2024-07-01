@@ -5,6 +5,7 @@ import defaults from './defaults'
 import { icons } from './icons'
 import { staticPrimaryColor, staticPrimaryDarkenColor, themes } from './theme'
 import { themeConfig } from '@themeConfig'
+import { en, fr } from 'vuetify/locale'
 
 // Styles
 import { cookieRef } from '@/@layouts/stores/config'
@@ -33,6 +34,10 @@ export default function (app) {
   const optionTheme = deepMerge({ themes }, cookieThemeValues)
 
   const vuetify = createVuetify({
+    lang: {
+      locales: { en, fr },
+      current: 'en',
+    },
     aliases: {
       IconBtn: VBtn,
     },

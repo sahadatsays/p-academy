@@ -31,6 +31,9 @@ class AdminMemberController extends ApiController
             $query = $this->sortBy($query, $sortBy->key, $sortBy->order);
         }
 
+        // filters by columns
+        $query = $this->filters($query, $request);
+
         // search
         if ($request->has('search')) {
             $search = $request->get('search');
@@ -67,6 +70,37 @@ class AdminMemberController extends ApiController
             return $query->orderBy('activated_at', $order);
         }
         return $query->orderBy($key, $order);
+    }
+
+    private function filters($query, $request)
+    {
+        // $request->only(['id', 'username', 'name', 'email', 'activated'])
+        if ($request->get('id')) {
+            $query->where('zt_users.id', $request->id);
+        }
+
+        if ($request->get('username')) {
+            $query->where('username', 'LIKE', '%' . $request->username . '%');
+        }
+
+        if ($request->get('name')) {
+            $query->where('first_name', 'LIKE', '%' . $request->name . '%')->orWhere('last_name', 'LIKE', '%' . $request->name . '%');
+        }
+
+        if ($request->get('email')) {
+            $query->where('email', 'LIKE', '%' . $request->email . '%');
+        }
+
+        if ($request->get('activated') == 'Active') {
+            $query->where('activated', 1);
+        }
+
+        if ($request->get('activated') == 'Inactive') {
+            $query->where('activated', 0);
+        }
+
+
+        return $query;
     }
 
     /**

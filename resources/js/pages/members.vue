@@ -1,5 +1,11 @@
 <script setup>
-const options = ref({})
+const options = ref({
+  id: '',
+  username: '',
+  name: '',
+  email: '',
+  activated: '',
+})
 
 const memberList = ref([])
 const totalMembers = ref(0)
@@ -109,6 +115,68 @@ watch(options, fetchMembers, { deep: true })
         :items-length="totalMembers"
         class="text-no-wrap"
       >
+        <template #body.prepend>
+          <tr>
+            <td>
+              <AppTextField
+                v-model="options.id"
+                density="compact"
+                append-inner-icon="tabler-search"
+                single-line
+                hide-details
+                dense
+                outlined
+                style="width: 5rem;"
+              /> 
+            </td>
+            <td>
+              <AppTextField 
+                v-model="options.username"
+                append-inner-icon="tabler-search"
+                density="compact"
+                single-line
+                hide-details
+                dense
+                outlined
+              />
+            </td>
+            <td>
+              <AppTextField 
+                v-model="options.name"
+                density="compact"
+                append-inner-icon="tabler-search"
+                single-line
+                hide-details
+                dense
+                outlined
+              />
+            </td>
+            <td>
+              <AppTextField 
+                v-model="options.email"
+                density="compact"
+                append-inner-icon="tabler-search"
+                single-line
+                hide-details
+                dense
+                outlined
+              />
+            </td>
+            <td colspan="2" />
+            <td>
+              <AppSelect
+                v-model="options.activated"
+                :items="['None', 'Active', 'Inactive']"
+                density="compact"
+                placeholder="Select"
+                item-title="title"
+                item-value="value"
+                style="width: 5rem;"
+              />
+            </td>
+            <td colspan="3" />
+          </tr>
+        </template>
         <template #item.user.group="{ item }">
           <div class="d-flex align-center">
             <div 

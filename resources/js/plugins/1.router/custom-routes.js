@@ -3,9 +3,12 @@
 export const redirects = [
   {
     path: '/',
-    name: 'index',
+    name: 'root',
     redirect: to => {
       const hasToken = useCookie('accessToken').value
+      
+      console.log(hasToken)
+
       if (hasToken) {
         return { name: 'root' }
       }

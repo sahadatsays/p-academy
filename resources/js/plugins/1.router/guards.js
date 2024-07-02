@@ -14,6 +14,10 @@ export const setupGuards = router => {
 
     const publicPages = ['/login']
     const authRequired = !publicPages.includes(to.path)
+   
+    if (isLoggedIn && to.name == 'login') {
+      next({ name: 'root' })
+    }
     if (authRequired && !isLoggedIn) {
       next({
         name: 'login',

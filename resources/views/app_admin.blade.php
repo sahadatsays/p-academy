@@ -5,7 +5,7 @@
   <link rel="icon" href="{{ asset('favicon.ico') }}" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Poker Academie</title>
-  {{-- <link rel="stylesheet" type="text/css" href="{{ asset('loader.css') }}" /> --}}
+  <link rel="stylesheet" type="text/css" href="{{ asset('loader.css') }}" />
   @vite(['resources/js/main.js'])
 </head>
 

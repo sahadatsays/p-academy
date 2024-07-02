@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\QueryHelper;
 use App\Http\Requests\TournamentRequest;
 use App\Http\Resources\TournamentResource;
 use App\Models\Tournament;
@@ -14,19 +15,87 @@ class AdminTournamentController extends ApiController
      */
     public function index(Request $request)
     {
-        $perPage = $request->input('per_page', 10);
-        $sortField = $request->input('sort_by', 'id');
-        $sortOrder = $request->input('sort_order', 'desc');
+        $perPage = $request->input('itemsPerPage', 15);
 
         $query = Tournament::query();
 
         // sorting query
-        $query = $query->orderBy($sortField, $sortOrder);
+        if ($request->get('sortBy')) {
+            $sortBy = json_decode($request->get('sortBy'));
+            $query = $this->sortBy($query, $sortBy->key, $sortBy->order);
+        }
+
+        // filters by columns
+        $query = $this->filters($query, $request);
+
+        // search
+        if ($request->has('search')) {
+            $search = $request->get('search');
+            $columns = ['titre', 'id'];
+            $query = QueryHelper::searchAll($query, $search, $columns);
+        }
 
         // Pagination
         $tournaments = $query->paginate($perPage);
 
         return TournamentResource::collection($tournaments);
+    }
+
+    private function sortBy($query, $key, $order)
+    {
+        if ($key == 'id') {
+            return $query->orderBy('pa_tournois.id', $order);
+        }
+
+        if ($key == 'titre') {
+            return $query->orderBy('titre', $order);
+        }
+        
+        if ($key == 'operator.name') {
+            return $query->withAggregate('operator', 'nom')->orderBy('operator_nom', $order);
+        }
+
+        if ($key == 'since') {
+            return $query->orderBy('buyin', $order);
+        }
+
+        if ($key == 'type_tournament') {
+            return $query->orderBy('typetournoi', $order);
+        }
+        if ($key == 'password') {
+            return $query->orderBy('password', $order);
+        }
+
+        if ($key == 'added_op') {
+            return $query->orderBy('added_op', $order);
+        }
+
+        if ($key == 'start_date') {
+            return $query->orderBy('date_debut', $order);
+        }
+
+        if ($key == 'end_date') {
+            return $query->orderBy('date_fin', $order);
+        }
+
+        if ($key == 'article_id') {
+            return $query->orderBy('article_id', $order);
+        }
+
+        return $query->orderBy($key, $order);
+    }
+
+    private function filters($query, $request)
+    {
+        if ($request->get('id')) {
+            $query->where('id', $request->id);
+        }
+
+        if ($request->get('title')) {
+            $query->where('titre', 'LIKE', '%' . $request->title . '%');
+        }
+
+        return $query;
     }
 
     /**

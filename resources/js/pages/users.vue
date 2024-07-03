@@ -1,8 +1,8 @@
 <script setup>
 const options = ref({})
 
-const memberList = ref([])
-const totalMembers = ref(0)
+const dataList = ref([])
+const totalData = ref(0)
 const loading = ref(false)
 const perPage = ref(0)
 const search = ref('')
@@ -15,23 +15,23 @@ const headers = [
   },
   {
     title: 'Username',
-    key: 'user.username',
+    key: 'username',
   },
   {
-    title: 'nom',
-    key: 'user.name',
+    title: 'Name',
+    key: 'name',
+  },
+  {
+    title: 'First Name',
+    key: 'firstName',
   },
   {
     title: 'Email',
-    key: 'user.email',
+    key: 'email',
   },
   {
-    title: 'PPA',
-    key: 'ppa',
-  },
-  {
-    title: 'Groupe',
-    key: 'user.group',
+    title: 'Groups',
+    key: 'groupes',
     sortable: false,
   },
   {
@@ -39,12 +39,12 @@ const headers = [
     key: 'activated',
   },
   {
-    title: 'crée le',
-    key: 'user.createdAt',
+    title: 'Created At',
+    key: 'createdAt',
   },
   {
-    title: 'actif le',
-    key: 'user.activatedAt',
+    title: 'Last Login',
+    key: 'lastLogin',
   },
   {
     title: '#',
@@ -53,10 +53,10 @@ const headers = [
   },
 ]
 
-const fetchMembers = async () => {
+const fetchData = async () => {
   loading.value = true
 
-  const response = await $api('/admin/members', {
+  const response = await $api('/admin/users', {
     query: options.value,
     onResponseError({ response }) {
       console.log(response)
@@ -64,18 +64,18 @@ const fetchMembers = async () => {
   })
 
   // assign Response
-  memberList.value = response.data 
-  totalMembers.value = response.meta.total
+  dataList.value = response.data 
+  totalData.value = response.meta.total
   perPage.value = response.meta.per_page
   loading.value = false
 }
 
-watch(options, fetchMembers, { deep: true })
+watch(options, fetchData, { deep: true })
 </script>
 
 <template>
   <div>
-    <VCard title="Membres">
+    <VCard title="Users">
       <VCardText>
         <VRow>
           <VCol
@@ -103,10 +103,10 @@ watch(options, fetchMembers, { deep: true })
         :search="search"
         :items-per-page="perPage"
         :headers="headers"
-        :items="memberList"
+        :items="dataList"
         loading-text="Loading... Please wait"
         :loading="loading"
-        :items-length="totalMembers"
+        :items-length="totalData"
         class="text-no-wrap"
       >
         <template #body.prepend>
@@ -147,6 +147,17 @@ watch(options, fetchMembers, { deep: true })
             </td>
             <td>
               <AppTextField 
+                v-model="options.first_name"
+                density="compact"
+                append-inner-icon="tabler-search"
+                single-line
+                hide-details
+                dense
+                outlined
+              />
+            </td>
+            <td>
+              <AppTextField 
                 v-model="options.email"
                 density="compact"
                 append-inner-icon="tabler-search"
@@ -156,7 +167,17 @@ watch(options, fetchMembers, { deep: true })
                 outlined
               />
             </td>
-            <td colspan="2" />
+            <td>
+              <AppTextField 
+                v-model="options.group"
+                density="compact"
+                append-inner-icon="tabler-search"
+                single-line
+                hide-details
+                dense
+                outlined
+              />
+            </td>
             <td>
               <AppSelect
                 v-model="options.activated"
@@ -171,10 +192,10 @@ watch(options, fetchMembers, { deep: true })
             <td colspan="3" />
           </tr>
         </template>
-        <template #item.user.group="{ item }">
+        <template #item.groupes="{ item }">
           <div class="d-flex align-center">
             <div 
-              v-for="group in item.user.groupes" 
+              v-for="group in item.groupes" 
               :key="group.id" 
               class="d-flex flex-column ms-3"
             >
@@ -187,7 +208,7 @@ watch(options, fetchMembers, { deep: true })
         <!-- activated -->
         <template #item.activated="{ item }">
           <div class="d-flex align-center">
-            <VChip v-if="item.user.activated">
+            <VChip v-if="item.activated">
               <VIcon icon="tabler-circle-check text-2xl" />
             </VChip>
           </div>
@@ -200,9 +221,6 @@ watch(options, fetchMembers, { deep: true })
             </IconBtn>
             <IconBtn>
               <VIcon icon="tabler-pencil" />
-            </IconBtn>
-            <IconBtn>
-              <VIcon icon="tabler-user-filled" />
             </IconBtn>
           </div>
         </template>

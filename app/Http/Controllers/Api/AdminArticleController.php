@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\QueryHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ArticleResource;
 use App\Models\Article;
@@ -14,19 +15,74 @@ class AdminArticleController extends Controller
      */
     public function index(Request $request)
     {
-        $perPage = $request->input('per_page', 15);
-        $sortField = $request->input('sort_by', 'created_at');
-        $sortOrder = $request->input('sort_order', 'desc');
+        $perPage = $request->input('itemsPerPage', 15);
 
         $query = Article::query();
 
         // sorting query
-        $query = $query->orderBy($sortField, $sortOrder);
+        if ($request->get('sortBy')) {
+            $sortBy = json_decode($request->get('sortBy'));
+            $query = $this->sortBy($query, $sortBy->key, $sortBy->order);
+        }
+
+        // filters by columns
+        $query = $this->filters($query, $request);
+
+        // search
+        if ($request->has('search')) {
+            $search = $request->get('search');
+            $columns = ['id', 'title'];
+            $query = QueryHelper::searchAll($query, $search, $columns);
+        }
 
         // Pagination
         $articles = $query->with('user')->paginate($perPage);
 
         return ArticleResource::collection($articles);
+    }
+
+    private function sortBy($query, $key, $order)
+    {
+        if ($key == 'updated_at') {
+            return $query->orderBy('updated_at', $order);
+        }
+
+        if ($key == 'createdAt') {
+            return $query->orderBy('created_at', $order);
+        }
+
+        if ($key == 'createdBy') {
+            return $query->withAggregate('user', 'username')->orderBy('user_username', $order);
+        }
+
+        if ($key == 'createdAt') {
+            return $query->orderBy('created_at', $order);
+        }
+
+        if ($key == 'tags') {
+            return $query->whereHas('tags', function ($query) use ($order) {
+                $query->orderBy('name', $order);
+            });
+        }
+
+        return $query->orderBy($key, $order);
+    }
+
+    private function filters($query, $request)
+    {
+        if ($request->get('id')) {
+            $query->where('id', $request->id);
+        }
+
+        if ($request->get('activated') == 'Active') {
+            $query->where('state', 1);
+        }
+
+        if ($request->get('activated') == 'Inactive') {
+            $query->where('state', 0);
+        }
+
+        return $query;
     }
 
     /**

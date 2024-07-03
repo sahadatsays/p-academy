@@ -19,8 +19,10 @@ class TagResource extends JsonResource
             'id'            => $this->id,
             'name'          => $this->name,
             'type'          => $this->type,
-            'viewName'     => $this->view_name,
+            'viewName'      => $this->view_name,
+            'order'         => $this->order,
             'indexPage'     => $this->index_page,
+            'inUrl'         => $this->in_url,
             'createdAt'     => Carbon::parse($this->created_at)->toDateTimeString(),
             'updatedAt'     => Carbon::parse($this->updated_at)->toDateTimeString(),
             'parent'        => new TagResource($this->parent)

@@ -32,11 +32,11 @@ export default [
     children: [
       {
         title: 'Articles',
-        to: '',
+        to: { name: 'articles' },
       },
       {
         title: 'Tags',
-        to: '',
+        to: { name: 'tags' },
       },
       {
         title: 'Tags PA',

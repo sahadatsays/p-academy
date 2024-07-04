@@ -21,6 +21,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'api'], function () {
         Route::resource('users', App\Http\Controllers\Api\AdminUserController::class)->except(['create', 'edit', 'destroy', 'show']);
         Route::resource('articles', App\Http\Controllers\Api\AdminArticleController::class)->except(['create', 'edit', 'destroy', 'show']);
         Route::resource('tags', App\Http\Controllers\Api\AdminTagController::class)->except(['create', 'edit', 'destroy', 'show']);
+        Route::resource('menus', App\Http\Controllers\Api\AdminMenuController::class)->except(['create', 'edit', 'destroy', 'show']);
     });
 });
 

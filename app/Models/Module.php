@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Module extends Model
 {
@@ -11,6 +12,15 @@ class Module extends Model
     protected $table = 'zt_modules';
     protected $guarded = ['id'];
 
+    /**
+     * Get the user that owns the Module
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 
   public function translations()
   {
@@ -32,7 +42,7 @@ class Module extends Model
 
   public function modulerules()
   {
-    return $this->HasMany(ModuleRules::class);
+    return $this->HasMany(ModuleRules::class, 'module_id');
   }
 
   public function moduletracking()

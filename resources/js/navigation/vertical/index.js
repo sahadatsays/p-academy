@@ -1,6 +1,6 @@
 export default [
   {
-    title: 'tableau de bord',
+    title: 'Dashboard',
     to: { name: 'root' },
     icon: { icon: 'tabler-home-2' },
   },
@@ -40,19 +40,19 @@ export default [
       },
       {
         title: 'Tags PA',
-        to: '',
+        to: { name: 'pa-tags' },
       },
       {
         title: 'Modules',
-        to: '',
+        to: { name: 'modules' },
       },
       {
         title: 'SEO',
-        to: '',
+        to: { name: 'site-urls' },
       },
       {
         title: 'Menus',
-        to: '',
+        to: { name: 'menus' },
       },
     ],
   },

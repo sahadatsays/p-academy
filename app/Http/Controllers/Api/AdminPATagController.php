@@ -31,7 +31,7 @@ class AdminPATagController extends Controller
         // search
         if ($request->has('search')) {
             $search = $request->get('search');
-            $columns = ['name'];
+            $columns = ['id', 'name'];
             $query = QueryHelper::searchAll($query, $search, $columns);
         }
         // Pagination
@@ -48,6 +48,13 @@ class AdminPATagController extends Controller
 
     private function filters($query, $request)
     {
+        if ($request->id) {
+            $query->where('id', $request->id);
+        }
+        
+        if ($request->name) {
+            $query->where('name', 'LIKE', '%'. $request->name . '%');
+        }
 
         return $query;
     }

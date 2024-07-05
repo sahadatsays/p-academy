@@ -20,12 +20,12 @@ class MenuResource extends JsonResource
             'name'          => $this->name,
             'order'         => $this->order,
             'parent'        => new MenuResource($this->parent),
-            'url_externe'   => $this->url_externe,
+            'url'           => $this->url_externe,
             'targetBlank'   => $this->target_blank ? true : false,
-            'status'        => $this->state,
+            'status'        => $this->state ? true : false,
             'urlSite'       => new URLSiteResource($this->urlSite),
-            'updated'       => Carbon::parse($this->updated_at)->toDateTimeString(),
-            'created'       => Carbon::parse($this->created_at)->toDateTimeString(),
+            'updatedAt'     => Carbon::parse($this->updated_at)->toDateTimeString(),
+            'createdAt'     => Carbon::parse($this->created_at)->toDateTimeString(),
         ];
     }
 }

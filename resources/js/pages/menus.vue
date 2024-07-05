@@ -14,28 +14,17 @@ const headers = [
     key: 'id',
   },
   {
-    title: 'Title',
-    key: 'title',
+    title: 'Name',
+    key: 'name',
   },
   {
-    title: 'Tags',
-    key: 'tags',
+    title: 'URL',
+    key: 'url',
   },
   {
-    title: 'Created At',
-    key: 'createdAt',
-  },
-  {
-    title: 'Updated',
-    key: 'updated_at',
-  },
-  {
-    title: 'Created By',
-    key: 'createdBy',
-  },
-  {
-    title: 'State',
-    key: 'state',
+    title: 'Parent',
+    key: 'parent.name',
+    sortable: false,
   },
   {
     title: 'Order',
@@ -46,8 +35,16 @@ const headers = [
     key: 'rules',
   },
   {
-    title: 'Views',
-    key: 'hits',
+    title: 'Status',
+    key: 'status',
+  },
+  {
+    title: 'Created At',
+    key: 'createdAt',
+  },
+  {
+    title: 'Updated At',
+    key: 'updatedAt',
   },
   {
     title: '#',
@@ -59,7 +56,7 @@ const headers = [
 const fetchData = async () => {
   loading.value = true
 
-  const response = await $api('/admin/articles', {
+  const response = await $api('/admin/menus', {
     query: options.value,
     onResponseError({ response }) {
       console.log(response)
@@ -78,7 +75,7 @@ watch(options, fetchData, { deep: true })
 
 <template>
   <div>
-    <VCard title="Articles">
+    <VCard title="Menus">
       <VCardText>
         <VRow>
           <VCol
@@ -128,7 +125,7 @@ watch(options, fetchData, { deep: true })
             </td>
             <td>
               <AppTextField 
-                v-model="options.title"
+                v-model="options.name"
                 append-inner-icon="tabler-search"
                 density="compact"
                 single-line
@@ -137,48 +134,13 @@ watch(options, fetchData, { deep: true })
                 outlined
               />
             </td>
-            <td colspan="4" />
-            <td>
-              <AppSelect
-                v-model="options.activated"
-                :items="['None', 'Active', 'Inactive']"
-                density="compact"
-                placeholder="Select"
-                item-title="title"
-                item-value="value"
-                style="width: 5rem;"
-              />
-            </td>
-            <td colspan="4" />
+            <td colspan="8" />
           </tr>
         </template>
-        <template #item.tags="{ item }">
-          <div class="d-flex align-center">
-            <div 
-              v-for="tag in item.tags" 
-              :key="tag.id" 
-              class="d-flex flex-column ms-3"
-            >
-              <VChip label>
-                {{ tag.name }}
-              </VChip>
-            </div>
-          </div>
-        </template>
-        <!-- activated -->
-        <template #item.activated="{ item }">
-          <div class="d-flex align-center">
-            <VChip v-if="item.activated">
-              <VIcon icon="tabler-circle-check text-2xl" />
-            </VChip>
-          </div>
-        </template>
+
         <!-- actions -->
         <template #item.actions="{ item }">
           <div class="d-flex align-center">
-            <IconBtn>
-              <VIcon icon="tabler-eye" />
-            </IconBtn>
             <IconBtn>
               <VIcon icon="tabler-pencil" />
             </IconBtn>

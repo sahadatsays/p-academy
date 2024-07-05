@@ -70,7 +70,7 @@ watch(options, fetchData, { deep: true })
 
 <template>
   <div>
-    <VCard title="Users">
+    <VCard title="Tags">
       <VCardText>
         <VRow>
           <VCol

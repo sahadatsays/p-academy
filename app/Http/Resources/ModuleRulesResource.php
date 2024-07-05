@@ -17,6 +17,8 @@ class ModuleRulesResource extends JsonResource
         return [
             'id'                => $this->id,
             'show'              => $this->show ? true : false,
+            'type'              => $this->type,
+            'order'             => $this->order,
         ];
     }
 }

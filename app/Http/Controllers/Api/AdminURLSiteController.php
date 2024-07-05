@@ -42,11 +42,21 @@ class AdminURLSiteController extends Controller
 
     private function sortBy($query, $key, $order)
     {
+        if ($key == 'createdAt') {
+            return $query->orderBy('created_at', $order);
+        }
+
+        if ($key == 'updatedAt') {
+            return $query->orderBy('updated_at', $order);
+        }
         return $query->orderBy($key, $order);
     }
 
     private function filters($query, $request)
     {
+        if ($request->url) {
+            $query->where('url', 'LIKE', '%' . $request->url . '%');
+        }
         return $query;
     }
 

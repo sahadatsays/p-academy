@@ -18,7 +18,7 @@ class AdminModuleController extends Controller
         $perPage = $request->input('itemsPerPage', 15);
 
         $query = Module::query();
-        
+
         // sorting query
         if ($request->get('sortBy')) {
             $sortBy = json_decode($request->get('sortBy'));
@@ -31,7 +31,7 @@ class AdminModuleController extends Controller
         // search
         if ($request->has('search')) {
             $search = $request->get('search');
-            $columns = ['name'];
+            $columns = ['id', 'name'];
             $query = QueryHelper::searchAll($query, $search, $columns);
         }
         // Pagination
@@ -42,6 +42,17 @@ class AdminModuleController extends Controller
 
     private function sortBy($query, $key, $order)
     {
+        if ($key == 'createdAt') {
+            return $query->orderBy('created_at', $order);
+        }
+
+        if ($key == 'updatedAt') {
+            return $query->orderBy('updated_at', $order);
+        }
+
+        if ($key == 'status') {
+            return $query->orderBy('state', $order);
+        }
 
         return $query->orderBy($key, $order);
     }

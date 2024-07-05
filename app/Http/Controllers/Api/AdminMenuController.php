@@ -31,7 +31,7 @@ class AdminMenuController extends Controller
         // search
         if ($request->has('search')) {
             $search = $request->get('search');
-            $columns = [];
+            $columns = ['id', 'name'];
             $query = QueryHelper::searchAll($query, $search, $columns);
         }
 
@@ -43,56 +43,37 @@ class AdminMenuController extends Controller
 
     private function sortBy($query, $key, $order)
     {
-
-        if ($key == 'user.username') {
-            return $query->orderBy('username', $order);
-        }
-
-        if ($key == 'user.name') {
-            return $query->orderBy('first_name', $order);
-        }
-
-        if ($key == 'user.email') {
+        if ($key == 'email') {
             return $query->orderBy('email', $order);
         }
 
-        if ($key == 'user.createdAt') {
+        if ($key == 'createdAt') {
             return $query->orderBy('created_at', $order);
         }
 
-        if ($key == 'user.activatedAt') {
-            return $query->orderBy('activated_at', $order);
+        if ($key == 'updatedAt') {
+            return $query->orderBy('updated_at', $order);
+        }
+
+        if ($key == 'status') {
+            return $query->orderBy('state', $order);
+        }
+
+        if ($key == 'url') {
+            return $query->orderBy('url_externe', $order);
         }
         return $query->orderBy($key, $order);
     }
 
     private function filters($query, $request)
     {
-        // $request->only(['id', 'username', 'name', 'email', 'activated'])
         if ($request->get('id')) {
-            $query->where('zt_users.id', $request->id);
-        }
-
-        if ($request->get('username')) {
-            $query->where('username', 'LIKE', '%' . $request->username . '%');
+            $query->where('id', $request->id);
         }
 
         if ($request->get('name')) {
-            $query->where('first_name', 'LIKE', '%' . $request->name . '%')->orWhere('last_name', 'LIKE', '%' . $request->name . '%');
+            $query->where('name', 'LIKE', '%'. $request->name .'%');
         }
-
-        if ($request->get('email')) {
-            $query->where('email', 'LIKE', '%' . $request->email . '%');
-        }
-
-        if ($request->get('activated') == 'Active') {
-            $query->where('activated', 1);
-        }
-
-        if ($request->get('activated') == 'Inactive') {
-            $query->where('activated', 0);
-        }
-
 
         return $query;
     }

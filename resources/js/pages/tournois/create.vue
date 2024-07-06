@@ -1,15 +1,17 @@
 <script setup>
 const form = ref({
-  titre: '',
-  type: '',
-  buying: '',
-  password: '',
-  addedOp: '',
-  articleId: '',
+  date_debut: new Date(),
+  date_fin: new Date(),
 })
+
+const types = ref(['Freeroll', 'Freezeout', 'Rebuy'])
 
 const operators = ref([])
 const errors = ref([])
+const hasError = ref(false)
+const error = ref('')
+const successMessage = ref('')
+const hasSuccess = ref(false)
 
 const submitForm = async () => {
   const response = await $api('/admin/tournaments', {
@@ -17,11 +19,15 @@ const submitForm = async () => {
     body: form.value,
     onResponseError({ response }) {
       errors.value = response._data.errors
-      console.log(errors.value)
+      error.value = response._data.message
+      hasError.value = true
     },
   })
 
-  console.log(response)
+  errors.value = {}
+  successMessage.value = response.message
+  hasSuccess.value = response.success
+  form.value = {}
 }
 
 const fetchOperators = async () => {
@@ -37,12 +43,37 @@ onMounted(() => {
 
 <template>
   <div>
-    <VCard>
-      <VCardItem>
-        <VCardTitle>
-          New Tournament
-        </VCardTitle>
-      </VCardItem>
+    <VSnackbar
+      v-model="hasSuccess"
+      location="top end"
+      color="success"
+    >
+      <VIcon icon="tabler-exclamation-circle" />
+      {{ successMessage }}
+    </VSnackbar>
+
+    <VSnackbar
+      v-model="hasError"
+      location="top end"
+      color="error"
+    >
+      <VIcon icon="tabler-exclamation-circle" />
+      {{ error }}
+    </VSnackbar>
+
+    <VCard title="New Tournament">
+      <template #append>
+        <div class="mt-n4 me-n2">
+          <VBtn :to="{ name: 'tournois' }">
+            <VIcon
+              variant="tonal"
+              icon="tabler-list"
+              start
+            />
+            Tournois
+          </VBtn>
+        </div>
+      </template>
       <VCardText>
         <VForm @submit.prevent="submitForm">
           <VRow>
@@ -66,6 +97,7 @@ onMounted(() => {
               <AppSelect
                 v-model="form.operateur" 
                 :items="operators"
+                :error-messages="errors.operateur"
                 item-value="id"
                 item-title="name"
                 placeholder="Select Operator"
@@ -80,7 +112,9 @@ onMounted(() => {
               md="4"
             >
               <AppSelect 
-                :items="['item 1', 'item 2']"
+                v-model="form.typetournoi"
+                :items="types"
+                :error-messages="errors.typetournoi"
                 placeholder="Select Type"
                 name="type"
                 required
@@ -93,7 +127,8 @@ onMounted(() => {
               md="6"
             >
               <AppTextField
-                v-model="form.buying"
+                v-model="form.buyin"
+                :error-messages="errors.buyin"
                 placeholder="Buying"
               />
             </VCol>
@@ -105,6 +140,7 @@ onMounted(() => {
             >
               <AppTextField
                 v-model="form.password"
+                :error-messages="errors.password"
                 placeholder="******"
               />
             </VCol>
@@ -115,7 +151,8 @@ onMounted(() => {
               md="6"
             >
               <AppTextField
-                v-model="form.addedOp"
+                v-model="form.added_op"
+                :error-messages="errors.added_op"
                 placeholder="Added OP"
               />
             </VCol>
@@ -126,7 +163,8 @@ onMounted(() => {
               md="6"
             >
               <AppTextField
-                v-model="form.articleId"
+                v-model="form.article_id"
+                :error-messages="errors.article_id"
                 placeholder="Article ID"
               />
             </VCol>
@@ -137,8 +175,10 @@ onMounted(() => {
               md="6"
             >
               <AppDateTimePicker
-                v-model="form.startDate"
+                v-model="form.date_debut"
+                :model-value="form.date_debut"
                 placeholder="Start Date"
+                :error-messages="errors.date_debut"
                 prepend-inner-icon="tabler-calendar"
                 :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
               />
@@ -150,8 +190,10 @@ onMounted(() => {
               md="6"
             >
               <AppDateTimePicker
-                v-model="form.endDate"
+                v-model="form.date_fin"
+                :model-value="form.date_fin"
                 placeholder="End Date"
+                :error-messages="errors.date_fin"
                 prepend-inner-icon="tabler-calendar"
                 :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
               />

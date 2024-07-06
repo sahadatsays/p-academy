@@ -10,6 +10,6 @@ use Illuminate\Http\Request;
 class AdminFetchData extends Controller
 {
     public function fetchOperator() {
-        return OperatorResource::collection(Operator::all());
+        return OperatorResource::collection(Operator::query()->published()->orderBy('nom')->get());
     }
 }

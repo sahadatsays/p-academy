@@ -6,6 +6,7 @@ use App\Helpers\QueryHelper;
 use App\Http\Requests\TournamentRequest;
 use App\Http\Resources\TournamentResource;
 use App\Models\Tournament;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class AdminTournamentController extends ApiController
@@ -112,9 +113,9 @@ class AdminTournamentController extends ApiController
     public function store(TournamentRequest $request)
     {
         $data = $request->validated();
-        unset($data['heure_fin_submit']);
-        unset($data['heure_debut_submit']);
-
+        $data['date_debut'] = Carbon::parse($data['date_debut'])->toDateTimeString();
+        $data['date_fin'] = Carbon::parse($data['date_fin'])->toDateTimeString();
+        
         $tournament = Tournament::create($data);
         return $this->sendResponse(new TournamentResource($tournament), 'Le tournoi a été ajouté!');
     }

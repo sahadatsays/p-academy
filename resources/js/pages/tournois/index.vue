@@ -83,12 +83,28 @@ watch(options, fetchTournaments, { deep: true })
         <VRow>
           <VCol
             cols="12"
-            offset-md="8"
+            md="2"
+          >
+            <div>
+              <VBtn
+                block
+                :to="{ name: 'tournois-create' }"
+              >
+                <VIcon 
+                  icon="tabler-plus"
+                  start
+                />
+                Add a tournament
+              </VBtn>
+            </div>
+          </VCol>
+          <VCol
+            cols="12"
+            offset-md="6"
             md="4"
           >
             <AppTextField
               v-model="search"
-              density="compact"
               placeholder="Search ..."
               append-inner-icon="tabler-search"
               single-line

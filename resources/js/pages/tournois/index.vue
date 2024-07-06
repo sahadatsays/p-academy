@@ -160,7 +160,7 @@ watch(options, fetchTournaments, { deep: true })
         <!-- actions -->
         <template #item.actions="{ item }">
           <div class="d-flex align-center">
-            <IconBtn>
+            <IconBtn :to="{ name: 'tournois-edit-id', params: { id: item.id } }">
               <VIcon icon="tabler-pencil" />
             </IconBtn>
           </div>

@@ -55,6 +55,7 @@ declare module 'vue-router/auto/routes' {
     'tags': RouteRecordInfo<'tags', '/tags', Record<never, never>, Record<never, never>>,
     'tournois': RouteRecordInfo<'tournois', '/tournois', Record<never, never>, Record<never, never>>,
     'tournois-create': RouteRecordInfo<'tournois-create', '/tournois/create', Record<never, never>, Record<never, never>>,
+    'tournois-edit-id': RouteRecordInfo<'tournois-edit-id', '/tournois/edit/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     'users': RouteRecordInfo<'users', '/users', Record<never, never>, Record<never, never>>,
   }
 }

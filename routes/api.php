@@ -15,7 +15,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'api'], function () {
         });
 
         Route::resource('members', App\Http\Controllers\Api\AdminMemberController::class)->except(['edit', 'create', 'store', 'destroy']);
-        Route::resource('tournaments', App\Http\Controllers\Api\AdminTournamentController::class)->except(['create', 'edit', 'destroy', 'show']);
+        Route::resource('tournaments', App\Http\Controllers\Api\AdminTournamentController::class)->except(['create', 'edit', 'destroy']);
         Route::resource('orders', App\Http\Controllers\Api\AdminOrderController::class)->except(['create', 'edit', 'destroy', 'show']);
         Route::resource('affiliations', App\Http\Controllers\Api\AdminAffiliationController::class)->except(['create', 'edit', 'destroy', 'show']);
         Route::resource('users', App\Http\Controllers\Api\AdminUserController::class)->except(['create', 'edit', 'destroy', 'show']);

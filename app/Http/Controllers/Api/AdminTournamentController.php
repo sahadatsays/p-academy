@@ -113,9 +113,9 @@ class AdminTournamentController extends ApiController
     public function store(TournamentRequest $request)
     {
         $data = $request->validated();
-        $data['date_debut'] = Carbon::parse($data['date_debut'])->toDateTimeString();
-        $data['date_fin'] = Carbon::parse($data['date_fin'])->toDateTimeString();
-        
+        $data['date_debut'] =  Carbon::parse($data['date_debut']);
+        $data['date_fin'] = Carbon::parse($data['date_fin']);
+    
         $tournament = Tournament::create($data);
         return $this->sendResponse(new TournamentResource($tournament), 'Le tournoi a été ajouté!');
     }
@@ -125,7 +125,8 @@ class AdminTournamentController extends ApiController
      */
     public function show(string $id)
     {
-        //
+        $tournament = Tournament::findOrFail($id);
+        return new TournamentResource($tournament);
     }
 
     /**

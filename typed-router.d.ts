@@ -54,6 +54,7 @@ declare module 'vue-router/auto/routes' {
     'site-urls': RouteRecordInfo<'site-urls', '/site-urls', Record<never, never>, Record<never, never>>,
     'tags': RouteRecordInfo<'tags', '/tags', Record<never, never>, Record<never, never>>,
     'tournois': RouteRecordInfo<'tournois', '/tournois', Record<never, never>, Record<never, never>>,
+    'tournois-create': RouteRecordInfo<'tournois-create', '/tournois/create', Record<never, never>, Record<never, never>>,
     'users': RouteRecordInfo<'users', '/users', Record<never, never>, Record<never, never>>,
   }
 }

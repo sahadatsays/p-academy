@@ -25,6 +25,11 @@ Route::group(['prefix' => 'admin', 'middleware' => 'api'], function () {
         Route::resource('modules', App\Http\Controllers\Api\AdminModuleController::class)->except(['create', 'edit', 'destroy', 'show']);
         Route::resource('patags', App\Http\Controllers\Api\AdminPATagController::class)->except(['create', 'edit', 'destroy', 'show']);
         Route::resource('siteurls', App\Http\Controllers\Api\AdminURLSiteController::class)->except(['create', 'edit', 'destroy', 'show']);
+
+        /**
+         * Data Fetching For select options
+         */
+        Route::get('fetch/operator', [App\Http\Controllers\Api\AdminFetchData::class, 'fetchOperator'])->name('fetch.operators');
     });
 });
 

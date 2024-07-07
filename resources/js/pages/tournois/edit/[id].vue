@@ -204,7 +204,7 @@ onMounted(() => {
                 placeholder="Start Date"
                 :error-messages="errors.date_debut"
                 prepend-inner-icon="tabler-calendar"
-                :config="{ enableTime: true, dateFormat: 'Y-m-d H:i', minDate: 'today' }"
+                :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
               />
             </VCol>
 
@@ -219,7 +219,7 @@ onMounted(() => {
                 placeholder="End Date"
                 :error-messages="errors.date_fin"
                 prepend-inner-icon="tabler-calendar"
-                :config="{ enableTime: true, dateFormat: 'Y-m-d H:i', minDate: 'today' }"
+                :config="{ enableTime: true, dateFormat: 'Y-m-d H:i' }"
               />
             </VCol>
 

@@ -219,7 +219,7 @@ watch(options, fetchData, { deep: true })
             <IconBtn>
               <VIcon icon="tabler-external-link" />
             </IconBtn>
-            <IconBtn>
+            <IconBtn :to="{ name: 'users-edit-id', params: { id: item.id } }">
               <VIcon icon="tabler-pencil" />
             </IconBtn>
           </div>

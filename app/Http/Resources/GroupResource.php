@@ -17,7 +17,7 @@ class GroupResource extends JsonResource
     {
         return [
             'id'            => $this->id,
-            'name'          => $this->name,
+            'name'          => str()->ucfirst($this->name),
             'permissions'   => $this->permissions,
             'createdAt'     => Carbon::parse($this->created_at)->toDateTimeString(),
             'pivot'         => $this->pivot,

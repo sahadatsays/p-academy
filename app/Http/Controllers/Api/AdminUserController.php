@@ -8,7 +8,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class AdminUserController extends Controller
+class AdminUserController extends ApiController
 {
     /**
      * Display a listing of the resource.
@@ -121,7 +121,12 @@ class AdminUserController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $user = User::find($id);
+        if ($user == null) {
+            return $this->sendError('User has not found!');
+        }
+
+        return new UserResource($user);
     }
 
     /**
@@ -129,7 +134,40 @@ class AdminUserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $user = User::find($id);
+        if ($user == null) {
+            return $this->sendError('User not found!');
+        }
+
+        $rules = [
+            'username'      => 'required|string',
+            'email'         => 'required|email|string',
+            'firstName'    => 'required|string',
+            'lastName'    => 'required|string',
+            'groups'      => 'required|array'
+        ];
+
+        if ($request->password) {
+            $rules['password'] = 'required|min:6|confirmed';
+        }
+
+        $validate = $request->validate($rules);
+
+        $data = [
+            'first_name' => $validate['firstName'],
+            'last_name' => $validate['lastName'],
+            'email' => $validate['email'],
+            'username' => $validate['username'],
+        ];
+
+        if ($request->password) {
+            $data['password'] = bcrypt($request->password);
+        }
+
+        $user->update($data);
+        $user->groups()->sync($validate['groups']);
+
+        return $this->sendResponse($user, 'User has been updated!');
     }
 
     /**

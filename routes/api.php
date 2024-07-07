@@ -18,7 +18,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'api'], function () {
         Route::resource('tournaments', App\Http\Controllers\Api\AdminTournamentController::class)->except(['create', 'edit', 'destroy']);
         Route::resource('orders', App\Http\Controllers\Api\AdminOrderController::class)->except(['create', 'edit', 'destroy', 'show']);
         Route::resource('affiliations', App\Http\Controllers\Api\AdminAffiliationController::class)->except(['create', 'edit', 'destroy', 'show']);
-        Route::resource('users', App\Http\Controllers\Api\AdminUserController::class)->except(['create', 'edit', 'destroy', 'show']);
+        Route::resource('users', App\Http\Controllers\Api\AdminUserController::class)->except(['create', 'destroy', 'show']);
         Route::resource('articles', App\Http\Controllers\Api\AdminArticleController::class)->except(['create', 'edit', 'destroy', 'show']);
         Route::resource('tags', App\Http\Controllers\Api\AdminTagController::class)->except(['create', 'edit', 'destroy', 'show']);
         Route::resource('menus', App\Http\Controllers\Api\AdminMenuController::class)->except(['create', 'edit', 'destroy', 'show']);
@@ -30,6 +30,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'api'], function () {
          * Data Fetching For select options
          */
         Route::get('fetch/operator', [App\Http\Controllers\Api\AdminFetchData::class, 'fetchOperator'])->name('fetch.operators');
+        Route::get('fetch/groups', [App\Http\Controllers\Api\AdminFetchData::class, 'fetchGroupData'])->name('fetch.groups');
     });
 });
 

@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\QueryHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TagResource;
+use App\Models\Language;
 use App\Models\Tag;
+use App\Models\TagTranslations;
 use Illuminate\Http\Request;
 
-class AdminTagController extends Controller
+class AdminTagController extends ApiController
 {
     /**
      * Display a listing of the resource.
@@ -55,6 +57,10 @@ class AdminTagController extends Controller
             return $query->orderBy('created_at', $order);
         }
 
+        if ($key == 'parent.name') {
+            return $query->orderBy('parent_id', $order);
+        }
+
         return $query->orderBy($key, $order);
     }
 
@@ -84,7 +90,37 @@ class AdminTagController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'name' => 'required|string',
+            'title' => 'required|string',
+            'lang' => 'required',
+        ]);
+
+        $data['parent_id'] = $request->input('parent_id', 0);
+        $data['view_name'] = 'blog.html';
+        $data['in_url'] = $request->input('in_url', 0);
+        $data['index_page'] = $request->input('index_page', 0);
+        $data['sort_by'] = 'publish_up desc';
+        $data['rules'] = 'admin';
+        $data['per_page'] = 15;
+
+        $tag = Tag::create($data);
+
+        // Tag Translations
+        $tagTranslationData = [
+            'tag_id'        => $tag->id,
+            'lang'          => $request->input('lang'),
+            'title'         => $request->input('title'),
+            'slug'          => str()->slug($request->input('title')),
+            'content1'      => $request->input('content1'),
+            'content2'      => $request->input('content2'),
+        ];
+
+        $traslation = TagTranslations::create($tagTranslationData);
+
+        $tag->refreshUrl( 'add tag' );
+
+        return $this->sendResponse($tag, 'Tag has been created.');
     }
 
     /**
@@ -100,7 +136,15 @@ class AdminTagController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $tag = Tag::findOrFail($id);
+
+        if ($tag == null) {
+            return $this->sendError('Tag not found.');
+        }
+        $translation = $tag->translations()->first();
+
+        return $this->sendResponse(['tag' => $tag, 'translation' => $translation], 'fetch tag');
+
     }
 
     /**
@@ -108,7 +152,48 @@ class AdminTagController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $tag = Tag::findOrFail($id);
+
+        if ($tag == null) {
+            return $this->sendError('Tag not found.');
+        }
+
+        $data = $request->validate([
+            'name' => 'required|string',
+            'title' => 'required|string',
+            'lang' => 'required',
+        ]);
+
+        $data['parent_id'] = $request->input('parent_id', 0) ?? 0;
+        $data['view_name'] = 'blog.html';
+        $data['in_url'] = $request->input('in_url') == "on" ? 1 : 0;
+        $data['index_page'] = $request->input('index_page') == "on" ? 1 : 0;
+        $data['sort_by'] = 'publish_up desc';
+        $data['rules'] = 'admin';
+        $data['per_page'] = 15;
+
+        $tag->update($data);
+
+        // Tag Translations
+        $tagTranslationData = [
+            'tag_id'        => $tag->id,
+            'lang'          => $request->input('lang'),
+            'title'         => $request->input('title'),
+            'slug'          => str()->slug($request->input('title')),
+            'content1'      => $request->input('content1'),
+            'content2'      => $request->input('content2'),
+        ];
+
+        $translation = $tag->translations()->where('lang', $request->input('lang'))->first();
+        if ($translation != null) {
+            $translation->update($tagTranslationData);
+        } else {
+            TagTranslations::create($tagTranslationData);
+        }
+
+        $tag->refreshUrl( 'add tag' );
+
+        return $this->sendResponse($tag, 'Tag has been updated.');
     }
 
     /**

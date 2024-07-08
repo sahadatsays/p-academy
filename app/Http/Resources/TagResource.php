@@ -25,7 +25,8 @@ class TagResource extends JsonResource
             'inUrl'         => $this->in_url,
             'createdAt'     => Carbon::parse($this->created_at)->toDateTimeString(),
             'updatedAt'     => Carbon::parse($this->updated_at)->toDateTimeString(),
-            'parent'        => new TagResource($this->parent)
+            'parent'        => new TagResource($this->parent),
+            'languages'     => []
         ];
     }
 }

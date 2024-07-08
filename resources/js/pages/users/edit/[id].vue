@@ -5,8 +5,6 @@ const form = ref({})
 const route = useRoute('users-edit-id')
 const router = useRouter()
 
-const types = ref(['Freeroll', 'Freezeout', 'Rebuy'])
-
 const groups = ref([])
 const inGroups = ref([])
 const errors = ref([])
@@ -185,8 +183,7 @@ onMounted(() => {
               <VCheckbox
                 v-for="group in groups"
                 :key="group.id"
-                v-model="inGroups" 
-                checked
+                v-model="inGroups"
                 :label="group.name"
                 :value="group.id"
               />

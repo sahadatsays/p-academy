@@ -75,12 +75,28 @@ watch(options, fetchData, { deep: true })
         <VRow>
           <VCol
             cols="12"
-            offset-md="8"
+            md="2"
+          >
+            <div>
+              <VBtn
+                block
+                :to="{ name: 'tags-create' }"
+              >
+                <VIcon 
+                  icon="tabler-plus"
+                  start
+                />
+                New Tag 
+              </VBtn>
+            </div>
+          </VCol>
+          <VCol
+            cols="12"
+            offset-md="6"
             md="4"
           >
             <AppTextField
               v-model="search"
-              density="compact"
               placeholder="Search ..."
               append-inner-icon="tabler-search"
               single-line
@@ -136,7 +152,7 @@ watch(options, fetchData, { deep: true })
         <!-- actions -->
         <template #item.actions="{ item }">
           <div class="d-flex align-center">
-            <IconBtn>
+            <IconBtn :to="{ name: 'tags-edit-id', params: { id: item.id } }">
               <VIcon icon="tabler-pencil" />
             </IconBtn>
             <IconBtn>

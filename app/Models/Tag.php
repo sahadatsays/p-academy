@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
@@ -11,6 +12,8 @@ class Tag extends Model
 {
     use HasFactory;
 
+    protected $guarded = ['id'];
+    
     protected $table = 'zt_tags';
 
     public function childs()
@@ -29,6 +32,15 @@ class Tag extends Model
         return $this->belongsToMany(Article::class, 'zt_tags_articles');
     }
 
+    /**
+     * Get all of the translations for the Tag
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function translations(): HasMany
+    {
+        return $this->hasMany(TagTranslations::class);
+    }
 
     public function articlesForIndex($lang)
     {
@@ -231,11 +243,6 @@ class Tag extends Model
     public function medias()
     {
         return $this->morphMany(Media::class, 'linkto')->where('state', '=', 1);
-    }
-
-    public function translations()
-    {
-        return $this->hasMany('\Kelio\Zetatori\TagTranslations');
     }
 
     public function buildTreeChilds($tree, $id)

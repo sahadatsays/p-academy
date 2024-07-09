@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\API;
 
 use App\Helpers\QueryHelper;
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PatagResource;
 use App\Models\Patag;
 use Illuminate\Http\Request;
 
-class AdminPATagController extends Controller
+class AdminPATagController extends ApiController
 {
     /**
      * Display a listing of the resource.
@@ -18,11 +19,13 @@ class AdminPATagController extends Controller
         $perPage = $request->input('itemsPerPage', 15);
 
         $query = Patag::query();
-        
+       
         // sorting query
         if ($request->get('sortBy')) {
             $sortBy = json_decode($request->get('sortBy'));
             $query = $this->sortBy($query, $sortBy->key, $sortBy->order);
+        } else {
+            $query = $query->orderBy('id', 'desc');
         }
 
         // filters by columns
@@ -35,14 +38,16 @@ class AdminPATagController extends Controller
             $query = QueryHelper::searchAll($query, $search, $columns);
         }
         // Pagination
-        $paTags = $query->paginate($perPage);
+        $paTags = $query->with('parent')->paginate($perPage);
 
         return PatagResource::collection($paTags);
     }
 
     private function sortBy($query, $key, $order)
-    {
-
+    {   
+        if ($key == 'parent_name') {
+            return $query->orderBy('parent_id', $order);
+        }
         return $query->orderBy($key, $order);
     }
 
@@ -72,7 +77,16 @@ class AdminPATagController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'parent_id' => 'required',
+            'name' => 'required|string',
+            // 'title' => 'required|string',
+            'type' => 'required|string'
+        ]);
+
+        $data['old_id'] = 0;
+        $patag = Patag::create($data);
+        return $this->sendResponse($patag, 'PaTag has been created.');
     }
 
     /**
@@ -88,7 +102,12 @@ class AdminPATagController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $paTag = Patag::find($id);
+        if ($paTag != null) {
+            return $this->sendResponse($paTag, 'Fetch data for edit');
+        }
+
+        return $this->sendError('PATag not found!');
     }
 
     /**
@@ -96,7 +115,21 @@ class AdminPATagController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $patag = Patag::find($id);
+        if ($patag == null) {
+            return $this->sendError('PA Tag not found');
+        }
+
+        $data = $request->validate([
+            'parent_id' => 'required',
+            'name' => 'required|string',
+            // 'title' => 'required|string',
+            'type' => 'required|string'
+        ]);
+
+        $data['old_id'] = 0;
+        $patag = $patag->update($data);
+        return $this->sendResponse($patag, 'PaTag has been updated.');
     }
 
     /**
@@ -104,6 +137,13 @@ class AdminPATagController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $patag = Patag::find($id);
+        if ($patag == null) {
+            return $this->sendError('PA Tag not found!');
+        }
+        $patag->childs()->delete();
+        $patag->delete();
+
+        return $this->sendResponse(null, 'Pa Tag has been deleted with the childs!');
     }
 }

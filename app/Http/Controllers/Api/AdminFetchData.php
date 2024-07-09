@@ -8,6 +8,7 @@ use App\Http\Resources\OperatorResource;
 use App\Models\Group;
 use App\Models\Language;
 use App\Models\Operator;
+use App\Models\Patag;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 
@@ -27,6 +28,12 @@ class AdminFetchData extends Controller
     public function fetchTags() 
     {
         $tags = Tag::query()->get(['id', 'name']);
+        return $tags;
+    }
+
+    public function fetchPATags() 
+    {
+        $tags = Patag::query()->get(['id', 'name']);
         return $tags;
     }
 

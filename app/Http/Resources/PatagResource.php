@@ -20,7 +20,7 @@ class PatagResource extends JsonResource
             'name'          => $this->name,
             'type'          => $this->type,
             'status'        => $this->state ? true : false,
-            'parent'        => new PatagResource($this->parent),
+            'parent_name'        => $this->parent->name,
             'article_counts'=> $this->articles()->count(),
             'createdAt'     => Carbon::parse($this->created_at)->toDateTimeString(),
             'updatedAt'     => Carbon::parse($this->updated_at)->toDateTimeString()

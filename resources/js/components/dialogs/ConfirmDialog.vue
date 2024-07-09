@@ -2,7 +2,7 @@
 const props = defineProps({
   confirmationQuestion: {
     type: String,
-    required: true,
+    default: 'Are you sure to delete ?',
   },
   isDialogVisible: {
     type: Boolean,
@@ -10,17 +10,21 @@ const props = defineProps({
   },
   confirmTitle: {
     type: String,
-    required: true,
+    default: 'Deleted',
   },
   confirmMsg: {
     type: String,
-    required: true,
+    default: 'Your data deleted successfully.',
   },
   cancelTitle: {
     type: String,
-    required: true,
+    default: 'Cancelled',
   },
   cancelMsg: {
+    type: String,
+    default: 'Delete Cancelled!!',
+  },
+  actionUrl: {
     type: String,
     required: true,
   },
@@ -29,19 +33,31 @@ const props = defineProps({
 const emit = defineEmits([
   'update:isDialogVisible',
   'confirm',
+  'updateList',
 ])
 
-const unsubscribed = ref(false)
+const confirmMessage = ref(props.confirmMsg)
+const deleted = ref(false)
 const cancelled = ref(false)
 
 const updateModelValue = val => {
   emit('update:isDialogVisible', val)
 }
 
+const deleteAction = async () => {
+  const res = await $api(props.actionUrl, {
+    method: 'DELETE',
+  })
+
+  emit('updateList')
+  confirmMessage.value = res.message
+}
+
 const onConfirmation = () => {
   emit('confirm', true)
   updateModelValue(false)
-  unsubscribed.value = true
+  deleted.value = true
+  deleteAction()
 }
 
 const onCancel = () => {
@@ -94,9 +110,9 @@ const onCancel = () => {
     </VCard>
   </VDialog>
 
-  <!-- Unsubscribed -->
+  <!-- deleted -->
   <VDialog
-    v-model="unsubscribed"
+    v-model="deleted"
     max-width="500"
   >
     <VCard>
@@ -118,11 +134,11 @@ const onCancel = () => {
           {{ props.confirmTitle }}
         </h1>
 
-        <p>{{ props.confirmMsg }}</p>
+        <p>{{ confirmMessage }}</p>
 
         <VBtn
           color="success"
-          @click="unsubscribed = false"
+          @click="deleted = false"
         >
           Ok
         </VBtn>

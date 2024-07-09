@@ -2,7 +2,7 @@
 <script setup>
 const form = ref({})
 const langs = ref([])
-const route = useRoute('users-edit-id')
+const route = useRoute('tags-edit-id')
 const router = useRouter()
 
 const parentTags = ref([])

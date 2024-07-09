@@ -18,7 +18,7 @@ class ModuleResource extends JsonResource
         return [
             'id'            => $this->id,
             'name'          => $this->name,
-            'status'        => $this->state ? true: false,
+            'status'        => $this->state,
             'showTtitle'    => $this->show_title ? true : false,
             'position'      => $this->position,
             'order'         => $this->order,

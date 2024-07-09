@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\API;
 
 use App\Helpers\QueryHelper;
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ModuleResource;
 use App\Models\Module;
 use Illuminate\Http\Request;
 
-class AdminModuleController extends Controller
+class AdminModuleController extends ApiController
 {
     /**
      * Display a listing of the resource.
@@ -76,7 +77,42 @@ class AdminModuleController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'title' => 'required|string',
+            'name' => 'required|string',
+            'position' => 'nullable|string',
+            'status' => 'nullable',
+            'show_title' => 'boolean',
+            'order' => 'nullable|numeric',
+            'lang' => 'required|string',
+            'content' => 'nullable|string'
+        ]);
+
+        // new module
+        $module = Module::create([
+            'name' => $data['name'], 
+            'position' => $data['position'] ?? '',
+            'state' => $data['status'],
+            'show_title' => $data['show_title'] ?? 0,
+            'order' => $data['order'],
+            'created_by' => 5,
+            'rules' => ''
+        ]);
+
+        // Module Translation
+        $moduleTranslation = $module->translations()->create([
+            'lang' => $data['lang'],
+            'title' => $data['title'],
+            'content'   => $data['content'],
+        ]);
+
+        // module Rules
+        $moduleRules = $module->modulerules()->create([
+            'show' => 1,
+            'type' => 'all'
+        ]);
+
+        return $this->sendResponse($module, 'New Module has been created!');
     }
 
     /**
@@ -92,7 +128,15 @@ class AdminModuleController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $module = Module::find($id);
+        if ($module == null) {
+            return $this->sendError('Module not found!');
+        }
+
+        $data['module'] = new ModuleResource($module);
+        $data['moduleTranslation'] = $module->translations()->first();
+
+        return $this->sendResponse($data, 'Module found!');
     }
 
     /**
@@ -100,7 +144,47 @@ class AdminModuleController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $module = Module::find($id);
+        if ($module == null) {
+            return $this->sendError('Module not found');
+        }
+
+        $data = $request->validate([
+            'title' => 'required|string',
+            'name' => 'required|string',
+            'position' => 'nullable|string',
+            'status' => 'nullable',
+            'show_title' => 'boolean',
+            'order' => 'nullable|numeric',
+            'lang' => 'required|string',
+            'content' => 'nullable|string'
+        ]);
+
+        // new module
+        $module->update([
+            'name' => $data['name'], 
+            'position' => $data['position'] ?? '',
+            'state' => $data['status'],
+            'show_title' => $data['show_title'] ?? 0,
+            'order' => $data['order'],
+            'created_by' => 5,
+            'rules' => ''
+        ]);
+
+        // Module Translation
+        $module->translations()->first()->update([
+            'lang' => $data['lang'],
+            'title' => $data['title'],
+            'content'   => $data['content'],
+        ]);
+
+        // module Rules
+        // $moduleRules = $module->modulerules()->create([
+        //     'show' => 1,
+        //     'type' => 'all'
+        // ]);
+
+        return $this->sendResponse($module, 'New Module has been updated!');
     }
 
     /**

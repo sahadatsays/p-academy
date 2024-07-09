@@ -44,7 +44,7 @@ export default [
       },
       {
         title: 'Modules',
-        to: { name: 'modules' },
+        to: { name: 'mods' },
       },
       {
         title: 'SEO',

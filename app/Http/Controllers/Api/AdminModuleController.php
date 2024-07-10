@@ -24,6 +24,8 @@ class AdminModuleController extends ApiController
         if ($request->get('sortBy')) {
             $sortBy = json_decode($request->get('sortBy'));
             $query = $this->sortBy($query, $sortBy->key, $sortBy->order);
+        } else {
+            $query = $query->orderBy('id', 'desc');
         }
 
         // filters by columns
@@ -192,6 +194,14 @@ class AdminModuleController extends ApiController
      */
     public function destroy(string $id)
     {
-        //
+        $module = Module::find($id);
+        if ($module == null) {
+            return $this->sendError('Module not found!');
+        }
+
+        $module->translations()->delete();
+        $module->modulerules()->delete();
+        $module->delete();
+        return $this->sendResponse(null, 'Module has been deleted!');
     }
 }

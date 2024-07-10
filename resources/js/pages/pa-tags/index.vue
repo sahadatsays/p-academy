@@ -68,7 +68,6 @@ const fetchData = async () => {
   loading.value = false
 }
 
-
 const deleteAction =  id => {
   confirmAlert.value = {
     confirm: true,

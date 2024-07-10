@@ -7,6 +7,12 @@ const loading = ref(false)
 const perPage = ref(0)
 const search = ref('')
 
+const confirmAlert = ref({
+  confirm: false,
+  actionUrl: '',
+  redirect: '',
+})
+
 // headers
 const headers = [
   {
@@ -61,11 +67,25 @@ const fetchData = async () => {
   loading.value = false
 }
 
+const deleteAction =  id => {
+  confirmAlert.value = {
+    confirm: true,
+    actionUrl: `/admin/modules/${id}`,
+  }
+}
+
 watch(options, fetchData, { deep: true })
 </script>
 
 <template>
   <div>
+    <!-- 👉 Confirm Dialog -->
+    <ConfirmDialog
+      v-model:isDialogVisible="confirmAlert.confirm"
+      :action-url="confirmAlert.actionUrl"
+      @update-list="fetchData"
+    />
+
     <VCard title="Modules">
       <VCardText>
         <VRow>
@@ -151,7 +171,7 @@ watch(options, fetchData, { deep: true })
             <IconBtn :to="{ name: 'mods-edit-id', params: { id: item.id } }">
               <VIcon icon="tabler-pencil" />
             </IconBtn>
-            <IconBtn>
+            <IconBtn @click="deleteAction(item.id)">
               <VIcon icon="tabler-square-x" />
             </IconBtn>
           </div>

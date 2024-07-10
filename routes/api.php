@@ -19,7 +19,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'api'], function () {
         Route::resource('orders', App\Http\Controllers\Api\AdminOrderController::class)->except(['create', 'edit', 'destroy', 'show']);
         Route::resource('affiliations', App\Http\Controllers\Api\AdminAffiliationController::class)->except(['create', 'edit', 'destroy', 'show']);
         Route::resource('users', App\Http\Controllers\Api\AdminUserController::class)->except(['create', 'destroy', 'show']);
-        Route::resource('articles', App\Http\Controllers\Api\AdminArticleController::class)->except(['create', 'edit', 'destroy', 'show']);
+        Route::resource('articles', App\Http\Controllers\Api\AdminArticleController::class)->except(['create', 'show']);
         Route::resource('tags', App\Http\Controllers\Api\AdminTagController::class)->except(['create', 'destroy', 'show']);
         Route::resource('menus', App\Http\Controllers\Api\AdminMenuController::class)->except(['create', 'show']);
         Route::resource('modules', App\Http\Controllers\Api\AdminModuleController::class)->except(['create', 'show']);

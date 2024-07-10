@@ -7,6 +7,12 @@ const loading = ref(false)
 const perPage = ref(0)
 const search = ref('')
 
+const confirmAlert = ref({
+  confirm: false,
+  actionUrl: '',
+  redirect: '',
+})
+
 // headers
 const headers = [
   {
@@ -73,22 +79,53 @@ const fetchData = async () => {
   loading.value = false
 }
 
+const deleteAction =  id => {
+  confirmAlert.value = {
+    confirm: true,
+    actionUrl: `/admin/articles/${id}`,
+  }
+}
+
 watch(options, fetchData, { deep: true })
 </script>
 
 <template>
   <div>
+    <!-- 👉 Confirm Dialog -->
+    <ConfirmDialog
+      v-model:isDialogVisible="confirmAlert.confirm"
+      :action-url="confirmAlert.actionUrl"
+      @update-list="fetchData"
+    />
+
     <VCard title="Articles">
       <VCardText>
         <VRow>
           <VCol
             cols="12"
-            offset-md="8"
+            md="2"
+          >
+            <div>
+              <VBtn
+                block
+                :to="{ name: 'articles-create' }"
+              >
+                <VIcon 
+                  icon="tabler-plus"
+                  start
+                />
+                New Article  
+              </VBtn>
+            </div>
+          </VCol>
+          
+          <VCol
+            cols="12"
+            offset-md="6"
             md="4"
           >
             <AppTextField
               v-model="search"
-              density="compact"
               placeholder="Search ..."
               append-inner-icon="tabler-search"
               single-line
@@ -182,7 +219,7 @@ watch(options, fetchData, { deep: true })
             <IconBtn>
               <VIcon icon="tabler-pencil" />
             </IconBtn>
-            <IconBtn>
+            <IconBtn @click="deleteAction(item.id)">
               <VIcon icon="tabler-square-x" />
             </IconBtn>
           </div>

@@ -8,7 +8,7 @@ use App\Http\Resources\ArticleResource;
 use App\Models\Article;
 use Illuminate\Http\Request;
 
-class AdminArticleController extends Controller
+class AdminArticleController extends ApiController
 {
     /**
      * Display a listing of the resource.
@@ -17,12 +17,14 @@ class AdminArticleController extends Controller
     {
         $perPage = $request->input('itemsPerPage', 15);
 
-        $query = Article::query();
+        $query = Article::query()->where('state', '!=', 2);
 
         // sorting query
         if ($request->get('sortBy')) {
             $sortBy = json_decode($request->get('sortBy'));
             $query = $this->sortBy($query, $sortBy->key, $sortBy->order);
+        } else {
+            $query = $query->orderBy('id', 'desc');
         }
 
         // filters by columns
@@ -100,7 +102,32 @@ class AdminArticleController extends Controller
     {
         $user = auth()->user();
 
-        dd($user);
+        $data = $request->validate([
+            'title' => 'required|string',
+            'content' => 'required|string',
+            'lang'  => 'required|string'
+        ]);
+
+        $article = Article::create([
+            'title' => $data['title'],
+            'slug' => str($data['title'])->slug(),
+            'content' => $data['content'],
+            'lang' => $data['lang'],
+            'state' => 0,
+            'view_name' => 'article.lire',
+            'publish_up' => now()->toDateTimeString(),
+            'publish_down' => '2099-01-01 00:00:00',
+            'user_id' => $user->id,
+            'url_pattern' => '{tags}/{slug}.html',
+            'rules' => ''
+        ]);
+
+        if ($article) {
+            $article->update(['group_lang_id' => $article->id]);
+            $article->urlsite()->create(['url' => $article->slug . '.html']);
+        }
+
+        return $this->sendResponse($article, 'The article has been added!');
     }
 
     /**
@@ -130,8 +157,14 @@ class AdminArticleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Article $article)
     {
-        //
+        if ($article->state == 0 || $article->state == 1) {
+            $article->update(['state' => 2]);
+            return $this->sendResponse($article, 'The article has been placed in the trash');
+        }
+
+        $article->delete();
+        return $this->sendResponse($article, 'The article has been deleted');
     }
 }

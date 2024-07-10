@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Resources\UserResource;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -73,5 +74,54 @@ class AdminAuthController extends ApiController
         $accessToken = $user->token();
         $accessToken->revoke();
         return $this->sendResponse([], 'Successfully logged out');
+    }
+
+    public function getProfile()
+    {
+        $user = User::find(auth()->id());
+
+        if ($user == null) {
+            return $this->sendError('User has not found!');
+        }
+
+        return new UserResource($user);
+    }
+
+    /**
+     * Profile update
+     */
+    public function updateProfile(Request $request)
+    {
+        $user = User::find(auth()->id());
+    
+        $rules = [
+            'username'      => 'required|string',
+            'email'         => 'required|email|string',
+            'firstName'    => 'required|string',
+            'lastName'    => 'required|string',
+            'groups'      => 'required|array'
+        ];
+
+        if ($request->password) {
+            $rules['password'] = 'required|min:6|confirmed';
+        }
+
+        $validate = $request->validate($rules);
+
+        $data = [
+            'first_name' => $validate['firstName'],
+            'last_name' => $validate['lastName'],
+            'email' => $validate['email'],
+            'username' => $validate['username'],
+        ];
+
+        if ($request->password) {
+            $data['password'] = bcrypt($request->password);
+        }
+
+        $user->update($data);
+        $user->groups()->sync($validate['groups']);
+
+        return $this->sendResponse($user, 'Profile has been updated!');
     }
 }

@@ -14,6 +14,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'api'], function () {
             return new UserResource($request->user());
         });
 
+        Route::get('get-profile', [App\Http\Controllers\API\Auth\AdminAuthController::class, 'getProfile'])->name('get.profile');
+        Route::post('profile-update', [App\Http\Controllers\API\Auth\AdminAuthController::class, 'updateProfile'])->name('updateProfile');
         Route::resource('members', App\Http\Controllers\Api\AdminMemberController::class)->except(['edit', 'create', 'store', 'destroy']);
         Route::resource('tournaments', App\Http\Controllers\Api\AdminTournamentController::class)->except(['create', 'edit', 'destroy']);
         Route::resource('orders', App\Http\Controllers\Api\AdminOrderController::class)->except(['create', 'edit', 'destroy', 'show']);

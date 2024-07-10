@@ -31,10 +31,9 @@ const userProfileList = [
     type: 'navItem',
     icon: 'tabler-user',
     title: 'Profile',
-    // to: {
-    //   name: 'apps-user-view-id',
-    //   params: { id: 21 },
-    // },
+    to: {
+      name: 'profile',
+    },
   },
   {
     type: 'navItem',

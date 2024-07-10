@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\API;
 
 use App\Helpers\QueryHelper;
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\URLSiteResource;
 use App\Models\Urlsite;
 use Illuminate\Http\Request;
 
-class AdminURLSiteController extends Controller
+class AdminURLSiteController extends ApiController
 {
     /**
      * Display a listing of the resource.
@@ -105,6 +106,8 @@ class AdminURLSiteController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $url = Urlsite::findOrFail($id);
+        $url->delete();
+        return $this->sendResponse(null, 'Url has been deleted!');
     }
 }

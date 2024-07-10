@@ -7,6 +7,12 @@ const loading = ref(false)
 const perPage = ref(0)
 const search = ref('')
 
+const confirmAlert = ref({
+  confirm: false,
+  actionUrl: '',
+  redirect: '',
+})
+
 // headers
 const headers = [
   {
@@ -45,11 +51,26 @@ const fetchData = async () => {
   loading.value = false
 }
 
+const deleteAction =  id => {
+  confirmAlert.value = {
+    confirm: true,
+    actionUrl: `/admin/siteurls/${id}`,
+  }
+}
+
+
 watch(options, fetchData, { deep: true })
 </script>
 
 <template>
   <div>
+    <!-- 👉 Confirm Dialog -->
+    <ConfirmDialog
+      v-model:isDialogVisible="confirmAlert.confirm"
+      :action-url="confirmAlert.actionUrl"
+      @update-list="fetchData"
+    />
+
     <VCard title="URL Sites">
       <VCardText>
         <VRow>
@@ -104,7 +125,10 @@ watch(options, fetchData, { deep: true })
         <!-- URL -->
         <template #item.url="{ item }">
           <div class="d-flex align-center">
-            <a :href="item.url" target="__blank">{{ item.url }}</a>
+            <a
+              :href="item.url"
+              target="__blank"
+            >{{ item.url }}</a>
           </div>
         </template>
 
@@ -112,9 +136,9 @@ watch(options, fetchData, { deep: true })
         <template #item.actions="{ item }">
           <div class="d-flex align-center">
             <IconBtn>
-              <VIcon icon="tabler-pencil" />
+              <VIcon icon="tabler-eye" />
             </IconBtn>
-            <IconBtn>
+            <IconBtn @click="deleteAction(item.id)">
               <VIcon icon="tabler-square-x" />
             </IconBtn>
           </div>

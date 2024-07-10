@@ -16,6 +16,16 @@ class Menu extends Model
     protected $guarded = ['id'];
 
     /**
+     * Get all of the translations for the Menu
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function translations(): HasMany
+    {
+        return $this->hasMany(MenuTranslations::class);
+    }
+
+    /**
      * Get the urlSite that owns the Menu
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -48,6 +58,6 @@ class Menu extends Model
     // Scope
     public function scopePublished($query)
     {
-        return $query->where('status', 1);
+        return $query->where('state', 1);
     }
 }

@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\GroupResource;
 use App\Http\Resources\OperatorResource;
+use App\Models\Article;
 use App\Models\Group;
 use App\Models\Language;
+use App\Models\Menu;
 use App\Models\Operator;
 use App\Models\Patag;
 use App\Models\Tag;
+use App\Models\TagTranslations;
 use Illuminate\Http\Request;
 
-class AdminFetchData extends Controller
+class AdminFetchData extends ApiController
 {
     public function fetchOperator() 
     {
@@ -40,6 +44,30 @@ class AdminFetchData extends Controller
     public function fetchLanguages()
     {
         return Language::query()->activated()->get(['id', 'english_name', 'default_locale']);
+    }
+
+    public function fetchMenus()
+    {
+        return Menu::query()->published()->get(['id', 'name']);
+    }
+
+    public function fetchUrls()
+    {
+        $options = array();
+       
+        foreach ( TagTranslations::query()->get() as $t )
+        {
+            $url = $t->urlsite;
+            if ( $url ) $options[] = array( 'id' => "$url->id", 'text' => 'T - ' . $t->title );
+        }
+
+        foreach ( Article::query()->get() as $a )
+        {
+            $url = $a->urlsite;
+            if ( $url ) $options[] = array( 'id' => "$url->id", 'text' => 'A - ' . $a->title );
+        }
+
+        return $this->sendResponse($options, 'fetch');
     }
 
 }

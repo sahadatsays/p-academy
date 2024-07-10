@@ -3,12 +3,13 @@
 namespace App\Http\Controllers\API;
 
 use App\Helpers\QueryHelper;
+use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MenuResource;
 use App\Models\Menu;
 use Illuminate\Http\Request;
 
-class AdminMenuController extends Controller
+class AdminMenuController extends ApiController
 {
     /**
      * Display a listing of the resource.
@@ -23,6 +24,8 @@ class AdminMenuController extends Controller
         if ($request->get('sortBy')) {
             $sortBy = json_decode($request->get('sortBy'));
             $query = $this->sortBy($query, $sortBy->key, $sortBy->order);
+        } else {
+            $query = $query->orderBy('id', 'desc');
         }
 
         // filters by columns
@@ -92,7 +95,44 @@ class AdminMenuController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'name' => 'required|string|max:200',
+            'title' => 'required|string',
+            'lang' => 'required|string',
+            'parent_id' => 'required',
+            'url_externe' => 'nullable',
+            'target_blank' => 'boolean',
+            'obfuscate' => 'nullable',
+            'urlsite_id' => 'nullable',
+            'status' => 'required',
+            'order' => 'required|numeric',
+        ]);
+
+        if(!$request->input('url_externe')) {
+            $data['urlsite_id'] = $request->input('urlsite_id');
+        } else {
+            $data['urlsite_id'] = 0;
+        }
+
+        $menu = Menu::create([
+            'name'          => $data['name'],
+            'menu_id'       => $data['parent_id'],
+            'url_externe'   => $data['url_externe'],
+            'urlsite_id'    => $data['urlsite_id'],
+            'order'         => $data['order'],
+            'state'         => $data['status'],
+            'target_blank'  => $data['target_blank'] ? 1 : 0,
+            'obfuscate'     => $data['obfuscate'] ? 1 : 0,
+            'rules'         => ''
+        ]);
+
+        // menu translation
+        $menuTranslation = $menu->translations()->create([
+            'lang' => $data['lang'],
+            'title' => $data['title'],
+        ]);
+
+        return $this->sendResponse(new MenuResource($menu), 'Menu has been added!');
     }
 
     /**
@@ -108,7 +148,15 @@ class AdminMenuController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $menu = Menu::find($id);
+        if ($menu == null) {
+            return $this->sendError('Menu not found');
+        }
+
+        $result['menu'] = new MenuResource($menu);
+        $result['translation'] = $menu->translations()->first();
+
+        return $this->sendResponse($result, 'Edit data');
     }
 
     /**
@@ -116,7 +164,49 @@ class AdminMenuController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $menu = Menu::find($id);
+        if ($menu == null) {
+            return $this->sendError('Menu not found');
+        }
+
+        $data = $request->validate([
+            'name' => 'required|string|max:200',
+            'title' => 'required|string',
+            'lang' => 'required|string',
+            'parent_id' => 'required',
+            'url_externe' => 'nullable',
+            'target_blank' => 'boolean',
+            'obfuscate' => 'nullable',
+            'urlsite_id' => 'nullable',
+            'status' => 'required',
+            'order' => 'required|numeric',
+        ]);
+
+        if(!$request->input('url_externe')) {
+            $data['urlsite_id'] = $request->input('urlsite_id');
+        } else {
+            $data['urlsite_id'] = 0;
+        }
+
+        $menu->update([
+            'name'          => $data['name'],
+            'menu_id'       => $data['parent_id'],
+            'url_externe'   => $data['url_externe'],
+            'urlsite_id'    => $data['urlsite_id'],
+            'order'         => $data['order'],
+            'state'         => $data['status'],
+            'target_blank'  => $data['target_blank'] ? 1 : 0,
+            'obfuscate'     => $data['obfuscate'] ? 1 : 0,
+            'rules'         => ''
+        ]);
+
+        // menu translation
+        $menu->translations()->first()->update([
+            'lang' => $data['lang'],
+            'title' => $data['title'],
+        ]);
+
+        return $this->sendResponse(new MenuResource($menu), 'Menu has been updated!');
     }
 
     /**
@@ -124,6 +214,13 @@ class AdminMenuController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $menu = Menu::find($id);
+        if ($menu == null) {
+            return $this->sendError('Menu not found!');
+        }
+
+        $menu->translations()->delete();
+        $menu->delete();
+        return $this->sendResponse(null, 'Menu has been deleted');
     }
 }

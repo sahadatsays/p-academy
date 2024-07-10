@@ -21,10 +21,10 @@ Route::group(['prefix' => 'admin', 'middleware' => 'api'], function () {
         Route::resource('users', App\Http\Controllers\Api\AdminUserController::class)->except(['create', 'destroy', 'show']);
         Route::resource('articles', App\Http\Controllers\Api\AdminArticleController::class)->except(['create', 'edit', 'destroy', 'show']);
         Route::resource('tags', App\Http\Controllers\Api\AdminTagController::class)->except(['create', 'destroy', 'show']);
-        Route::resource('menus', App\Http\Controllers\Api\AdminMenuController::class)->except(['create', 'edit', 'destroy', 'show']);
+        Route::resource('menus', App\Http\Controllers\Api\AdminMenuController::class)->except(['create', 'show']);
         Route::resource('modules', App\Http\Controllers\Api\AdminModuleController::class)->except(['create', 'show']);
         Route::resource('patags', App\Http\Controllers\Api\AdminPATagController::class)->except(['create', 'show']);
-        Route::resource('siteurls', App\Http\Controllers\Api\AdminURLSiteController::class)->except(['create', 'edit', 'destroy', 'show']);
+        Route::resource('siteurls', App\Http\Controllers\Api\AdminURLSiteController::class)->except(['create', 'edit', 'show']);
 
         /**
          * Data Fetching For select options
@@ -34,6 +34,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'api'], function () {
         Route::get('fetch/tags', [App\Http\Controllers\Api\AdminFetchData::class, 'fetchTags'])->name('fetch.tags');
         Route::get('fetch/patags', [App\Http\Controllers\Api\AdminFetchData::class, 'fetchPATags'])->name('fetch.patags');
         Route::get('fetch/langs', [App\Http\Controllers\Api\AdminFetchData::class, 'fetchLanguages'])->name('fetch.langs');
+        Route::get('fetch/menus', [App\Http\Controllers\Api\AdminFetchData::class, 'fetchMenus'])->name('fetch.menus');
+        Route::get('fetch/urls', [App\Http\Controllers\Api\AdminFetchData::class, 'fetchUrls'])->name('fetch.urls');
     });
 });
 

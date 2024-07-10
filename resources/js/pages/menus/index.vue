@@ -7,6 +7,12 @@ const loading = ref(false)
 const perPage = ref(0)
 const search = ref('')
 
+const confirmAlert = ref({
+  confirm: false,
+  actionUrl: '',
+  redirect: '',
+})
+
 // headers
 const headers = [
   {
@@ -18,12 +24,21 @@ const headers = [
     key: 'name',
   },
   {
-    title: 'Position',
-    key: 'position',
+    title: 'URL',
+    key: 'url',
+  },
+  {
+    title: 'Parent',
+    key: 'parent.name',
+    sortable: false,
   },
   {
     title: 'Order',
     key: 'order',
+  },
+  {
+    title: 'Rules',
+    key: 'rules',
   },
   {
     title: 'Status',
@@ -47,7 +62,7 @@ const headers = [
 const fetchData = async () => {
   loading.value = true
 
-  const response = await $api('/admin/modules', {
+  const response = await $api('/admin/menus', {
     query: options.value,
     onResponseError({ response }) {
       console.log(response)
@@ -61,22 +76,52 @@ const fetchData = async () => {
   loading.value = false
 }
 
+const deleteAction =  id => {
+  confirmAlert.value = {
+    confirm: true,
+    actionUrl: `/admin/menus/${id}`,
+  }
+}
+
 watch(options, fetchData, { deep: true })
 </script>
 
 <template>
   <div>
-    <VCard title="Modules">
+    <!-- 👉 Confirm Dialog -->
+    <ConfirmDialog
+      v-model:isDialogVisible="confirmAlert.confirm"
+      :action-url="confirmAlert.actionUrl"
+      @update-list="fetchData"
+    />
+    
+    <VCard title="Menus">
       <VCardText>
         <VRow>
           <VCol
             cols="12"
-            offset-md="8"
+            md="2"
+          >
+            <div>
+              <VBtn
+                block
+                :to="{ name: 'menus-create' }"
+              >
+                <VIcon 
+                  icon="tabler-plus"
+                  start
+                />
+                New Menu  
+              </VBtn>
+            </div>
+          </VCol>
+          <VCol
+            cols="12"
+            offset-md="6"
             md="4"
           >
             <AppTextField
               v-model="search"
-              density="compact"
               placeholder="Search ..."
               append-inner-icon="tabler-search"
               single-line
@@ -132,10 +177,10 @@ watch(options, fetchData, { deep: true })
         <!-- actions -->
         <template #item.actions="{ item }">
           <div class="d-flex align-center">
-            <IconBtn>
+            <IconBtn :to="{ name: 'menus-edit-id', params: {id: item.id} }">
               <VIcon icon="tabler-pencil" />
             </IconBtn>
-            <IconBtn>
+            <IconBtn @click="deleteAction(item.id)">
               <VIcon icon="tabler-square-x" />
             </IconBtn>
           </div>

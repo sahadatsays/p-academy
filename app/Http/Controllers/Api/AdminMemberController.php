@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Helpers\QueryHelper;
+use App\Http\Resources\AffiliationResource;
 use App\Http\Resources\MemberResource;
+use App\Http\Resources\PaymentResource;
+use App\Http\Resources\UserResource;
 use App\Models\Membre;
 use App\Models\Operator;
 use App\Models\TransfertPpa;
@@ -126,7 +129,17 @@ class AdminMemberController extends ApiController
     {
         try {
             $member = Membre::findOrFail($id);
-            return new MemberResource($member);
+            $commands = $member->commandes;
+            $payments = $member->payments;
+            $affiliations = $member->affiliations;
+
+            return [
+                'member' => new MemberResource($member),
+                'user' => new UserResource($member->user),
+                'commands' => MemberResource::collection($commands),
+                'payments' => PaymentResource::collection($payments),
+                'affiliations' => AffiliationResource::collection($affiliations)
+            ];
         } catch (ModelNotFoundException $th) {
             return $this->sendError($th->getMessage(), $th->getCode());
         }

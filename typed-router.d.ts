@@ -48,6 +48,7 @@ declare module 'vue-router/auto/routes' {
     'commandes': RouteRecordInfo<'commandes', '/commandes', Record<never, never>, Record<never, never>>,
     'login': RouteRecordInfo<'login', '/login', Record<never, never>, Record<never, never>>,
     'members': RouteRecordInfo<'members', '/members', Record<never, never>, Record<never, never>>,
+    'members-edit-id': RouteRecordInfo<'members-edit-id', '/members/edit/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     'menus': RouteRecordInfo<'menus', '/menus', Record<never, never>, Record<never, never>>,
     'menus-create': RouteRecordInfo<'menus-create', '/menus/create', Record<never, never>, Record<never, never>>,
     'menus-edit-id': RouteRecordInfo<'menus-edit-id', '/menus/edit/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,

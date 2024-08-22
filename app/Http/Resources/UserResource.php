@@ -25,8 +25,8 @@ class UserResource extends JsonResource
             'groupes' => GroupResource::collection($this->groups),
             'activated' => $this->activated ? true : false,
             'activatedAt' => $this->activated_at != null ? Carbon::parse($this->activated_at)->toDateTimeString() : null,
-            'createdAt' => $this->created_at != null ? Carbon::parse($this->created_at)->toDateTimeString() : null,
-            'lastActivity' => $this->last_activity != null ? Carbon::parse($this->last_activity)->toDateTimeString() : null,
+            'createdAt' => $this->created_at != null ? Carbon::parse($this->created_at)->format('d F Y - H:i') : null,
+            'lastActivity' => $this->last_activity != null ? Carbon::parse($this->last_activity)->format('d F Y - H:i') : null,
             'lastLogin' => $this->last_login != null ? Carbon::parse($this->last_login)->toDateTimeString() : null,
         ];
     }

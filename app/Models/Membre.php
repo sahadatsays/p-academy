@@ -70,6 +70,26 @@ class Membre extends Model
     }
 
     /**
+     * Get all of the affiliations for the Membre
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function commandes(): HasMany
+    {
+        return $this->hasMany(Commande::class, 'user_id');
+    }
+
+    /**
+     * Get all of the payments for the Membre
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class, 'user_id');
+    }
+
+    /**
      * @param $room_id
      * @return @object
      */

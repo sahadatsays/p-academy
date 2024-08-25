@@ -1,4 +1,47 @@
+<script setup>
+const props = defineProps({
+  allTransfertPpa: {
+    type: Array,
+    required: true,
+  },
+});
+
+// headers
+const headers = [
+  {
+    title: "Id",
+    key: "id",
+  },
+  {
+    title: "Expediteur",
+    key: "expediteur",
+  },
+  {
+    title: "Destinataire",
+    key: "destinataire",
+  },
+  {
+    title: "PPA",
+    key: "ppa",
+  },
+  {
+    title: "Motif",
+    key: "motif",
+  },
+  {
+    title: "Categ",
+    key: "categ",
+  },
+  {
+    title: "crée le",
+    key: "createdAt",
+  },
+];
+
+</script>
+
 <template>
-    <h2 class="mb-4">Trasfert PPA</h2>
-    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione veniam ut possimus iusto doloribus cupiditate, rerum voluptatum sit ab maxime neque ducimus culpa iste ullam, at aut assumenda minus a.</p>
+  <VCard>
+    <v-data-table :headers="headers" :items="props.allTransfertPpa"></v-data-table>
+  </VCard>
 </template>

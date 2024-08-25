@@ -6,11 +6,13 @@ use App\Helpers\QueryHelper;
 use App\Http\Resources\AffiliationResource;
 use App\Http\Resources\MemberResource;
 use App\Http\Resources\PaymentResource;
+use App\Http\Resources\TransfertPpaResource;
 use App\Http\Resources\UserResource;
 use App\Models\Membre;
 use App\Models\Operator;
 use App\Models\TransfertPpa;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -132,13 +134,17 @@ class AdminMemberController extends ApiController
             $commands = $member->commandes;
             $payments = $member->payments;
             $affiliations = $member->affiliations;
+            $status = $member->user->getStatus();
+            $allTransfertPpa = $member->allTransfertPpa()->sortByDesc('created_at');
 
             return [
                 'member' => new MemberResource($member),
                 'user' => new UserResource($member->user),
                 'commands' => MemberResource::collection($commands),
                 'payments' => PaymentResource::collection($payments),
-                'affiliations' => AffiliationResource::collection($affiliations)
+                'affiliations' => AffiliationResource::collection($affiliations),
+                'status' => $status,
+                'allTransfertPpa' => TransfertPpaResource::collection($allTransfertPpa)
             ];
         } catch (ModelNotFoundException $th) {
             return $this->sendError($th->getMessage(), $th->getCode());
@@ -208,5 +214,36 @@ class AdminMemberController extends ApiController
     public function destroy(string $id)
     {
         //
+    }
+
+    /**
+     * Status update
+     */
+    public function updateStatus(Request $request, User $user)
+    {
+        $data = $request->all();
+
+        if (!strtotime($data['ending_at'])) {
+            $data['ending_at'] = '';
+        } else {
+            $data['ending_at'] = Carbon::parse($data['ending_at'])->format('Y-m-d');
+        }
+        $status = $user->getStatus();
+
+        if ($user->isSilver())  $user->removeSilver();
+        if ($user->isGold())     $user->removeGold();
+
+        $sub_id = null;
+        $plan_id = null;
+
+        if ($data['level'] == 'silver') {
+            $user->addSilver($data['ending_at'], $plan_id, $sub_id);
+        }
+
+        if ($data['level'] == 'gold') {
+            $user->addGold($data['ending_at'], $plan_id, $sub_id);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Member status updated.']);
     }
 }

@@ -33,6 +33,7 @@ const headers = [
     title: 'Groups',
     key: 'groupes',
     sortable: false,
+    maxWidth: '100px'
   },
   {
     title: 'activé',

@@ -258,7 +258,7 @@ class User extends Authenticatable
       
         $updateContact['email'] = $this->email;
 
-        $statut = $this->getStatut();
+        $statut = $this->getStatus();
         $data =
             [
             'USERID' => $this->id,
@@ -369,7 +369,7 @@ class User extends Authenticatable
             try {
                 $response = $curl->post($endpoint.$url, $contactEmails);
             } catch (\Exception$e) {
-                \Log::info('Exception when removefromList: ' . $e->getMessage());
+                Log::info('Exception when removefromList: ' . $e->getMessage());
 
             }
         }
@@ -398,6 +398,87 @@ class User extends Authenticatable
             {
                 Log::info( 'Exception when calling updateonsib add to nl 20: ' . $e->getMessage() );
             }
+        }
+
+    }
+
+    public function createOnSIB()
+    {
+        $createContact['email'] = $this->email;
+        $createContact['attributes'] = ['USERID' => $this->id, 'PSEUDO' => $this->username, 'PREMIUM' => false, 'REGISTERED_AT' => substr($this->created_at, 0, 10)];
+
+        $createContact['emailBlacklisted'] = false;
+        $membre = $this->membre;
+        // if($membre and $membre->news == 0 ) $createContact['emailBlacklisted'] = true;
+
+        $curl = new \anlutro\cURL\cURL;
+        $endpoint = config("pokac.endpoint_n8n"); // prod
+
+        $url = "8b11e8af-2539-4a1b-aa7c-36fb8253c8a8";
+
+        try
+        {
+            $response = $curl->post($endpoint.$url, $createContact);
+            if( $response->statusCode == 400 ) $this->updateOnSIB();
+        }
+        catch ( \Exception $e )
+        {
+            Log::info( 'Exception when calling createonsib: ' . $e->getMessage() );
+            $this->updateOnSIB();
+        }
+
+    
+        $contactEmails['emails'] = [$this->email];
+        $contactEmails['nl'] = 4;
+        $url = "7832f38f-d7ed-49c0-838a-64ad3b586a1f";
+
+        try
+        {
+            $response = $curl->post($endpoint.$url, $contactEmails);
+
+        }
+        catch ( \Exception $e )
+        {
+            Log::info( 'Exception when calling updateonsib add to nl 4: ' . $e->getMessage() );
+        }
+
+        if ($membre and $membre->news == 0) {
+            //$updateContact['emailBlacklisted'] = true;
+            $news = false;
+        } else {
+            $news = true;
+        }
+// on ajoute à NEWSLETTER
+
+        if ($news) {
+            $contactEmails['emails'] = [$this->email];
+            $contactEmails['nl'] = 20;
+            $url = "7832f38f-d7ed-49c0-838a-64ad3b586a1f";
+    
+            try
+            {
+                $response = $curl->post($endpoint.$url, $contactEmails);
+
+            }
+            catch ( \Exception $e )
+            {
+                \Log::info( 'Exception when calling updateonsib add to nl 20: ' . $e->getMessage() );
+            }
+    
+        } else {
+           
+
+            $contactEmails['emails'] = [$this->email];
+            $contactEmails['nl'] = 20;
+            $url = "1a2b473f-c4e2-4a0f-9c11-aa1d27fa7fc3";
+
+            try {
+                $response = $curl->post($endpoint.$url, $contactEmails);
+            } catch (\Exception$e) {
+                \Log::info('Exception when removefromList: ' . $e->getMessage());
+
+            }
+            
         }
 
     }

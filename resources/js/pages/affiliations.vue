@@ -1,58 +1,100 @@
 <script setup>
-const options = ref({})
+const options = ref({});
 
-const affiliations = ref([])
-const totalAffiliations = ref(0)
-const loading = ref(false)
-const perPage = ref(0)
-const search = ref('')
+const affiliations = ref([]);
+const totalAffiliations = ref(0);
+const loading = ref(false);
+const perPage = ref(0);
+const search = ref("");
+
+const editableStatus = {
+  "Demande reçue": "blue",
+  "Demande en cours": "blue",
+  "Compte Affilié": "green",
+  "Compte non-affilié": "gray",
+  "Compte affiliable (Unibet)": "blue",
+  "Compte introuvable": "red",
+  Anomalie: "red",
+};
+
+const statusList = [
+  {
+    value: "Demande reçue",
+    text: "Demande reçue",
+  },
+  {
+    value: "Demande en cours",
+    text: "Demande en cours",
+  },
+  {
+    value: "Compte Affilié",
+    text: "Compte Affilié",
+  },
+  {
+    value: "Compte non-affilié",
+    text: "Compte non-affilié",
+  },
+  {
+    value: "Compte affiliable (Unibet)",
+    text: "Compte affiliable (Unibet)",
+  },
+  {
+    value: "Compte introuvable",
+    text: "Compte introuvable",
+  },
+  {
+    value: "Anomalie",
+    text: "Anomalie",
+  },
+];
 
 // headers
 const headers = [
   {
-    title: 'Room',
-    key: 'room',
+    title: "Room",
+    key: "room",
   },
   {
-    title: 'User ID',
-    key: 'userid',
+    title: "User ID",
+    key: "userid",
   },
   {
-    title: 'Username',
-    key: 'username',
+    title: "Username",
+    key: "username",
   },
   {
-    title: 'Pseudo Room',
-    key: 'pseudo_room',
+    title: "Pseudo Room",
+    key: "pseudo_room",
   },
   {
-    title: 'Status',
-    key: 'statut',
+    title: "Status",
+    key: "statut",
   },
   {
-    title: 'Date',
-    key: 'user.createdAt',
+    title: "Date",
+    key: "user.createdAt",
   },
-]
+];
 
 const fetchAffiliations = async () => {
-  loading.value = true
+  loading.value = true;
 
-  const response = await $api('/admin/affiliations', {
+  const response = await $api("/admin/affiliations", {
     query: options.value,
     onResponseError({ response }) {
-      console.log(response)
+      console.log(response);
     },
-  })
+  });
+  console.log(response);
 
   // assign Response
-  affiliations.value = response.data 
-  totalAffiliations.value = response.meta.total
-  perPage.value = response.meta.per_page
-  loading.value = false
-}
+  affiliations.value = response.data;
+  totalAffiliations.value = response.meta.total;
+  perPage.value = response.meta.per_page;
+  loading.value = false;
+};
 
-watch(options, fetchAffiliations, { deep: true })
+watch(options, fetchAffiliations, { deep: true });
 </script>
 
 <template>
@@ -60,11 +102,12 @@ watch(options, fetchAffiliations, { deep: true })
     <VCard title="Affiliations">
       <VCardText>
         <VRow>
-          <VCol
-            cols="12"
-            offset-md="8"
-            md="4"
-          >
+          <VCol cols="12" md="6">
+            <VBtn>Importer PPA</VBtn>
+            <VBtn class="ml-3">Importer PPA</VBtn>
+          </VCol>
+
+          <VCol cols="12" offset-md="2" md="4">
             <AppTextField
               v-model="search"
               density="compact"
@@ -74,7 +117,7 @@ watch(options, fetchAffiliations, { deep: true })
               hide-details
               dense
               outlined
-            /> 
+            />
           </VCol>
         </VRow>
       </VCardText>
@@ -102,11 +145,11 @@ watch(options, fetchAffiliations, { deep: true })
                 hide-details
                 dense
                 outlined
-                style="width: 5rem;"
-              /> 
+                style="width: 5rem"
+              />
             </td>
             <td>
-              <AppTextField 
+              <AppTextField
                 v-model="options.userid"
                 append-inner-icon="tabler-search"
                 density="compact"
@@ -117,7 +160,7 @@ watch(options, fetchAffiliations, { deep: true })
               />
             </td>
             <td>
-              <AppTextField 
+              <AppTextField
                 v-model="options.username"
                 density="compact"
                 append-inner-icon="tabler-search"
@@ -128,7 +171,7 @@ watch(options, fetchAffiliations, { deep: true })
               />
             </td>
             <td>
-              <AppTextField 
+              <AppTextField
                 v-model="options.pseudo_room"
                 density="compact"
                 append-inner-icon="tabler-search"
@@ -139,7 +182,7 @@ watch(options, fetchAffiliations, { deep: true })
               />
             </td>
             <td>
-              <AppTextField 
+              <AppTextField
                 v-model="options.status"
                 density="compact"
                 append-inner-icon="tabler-search"

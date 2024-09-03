@@ -2,13 +2,11 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Log;
 use Laravel\Passport\HasApiTokens;
 use stdClass;
 
@@ -175,13 +173,13 @@ class User extends Authenticatable
     public function addSilver($ending_at = null, $plan = null, $sub_id = null)
     {
         $this->groups()->attach(4, ['ending_at' => $ending_at, 'plan' => $plan, 'sub_id' => $sub_id]);
-        // $this->updateOnSIB();
+        $this->updateOnSIB();
     }
 
     public function removeSilver()
     {
         $this->groups()->detach(4);
-        // $this->updateOnSIB();
+        $this->updateOnSIB();
     }
 
         /**
@@ -192,7 +190,7 @@ class User extends Authenticatable
     public function updateSilver($ending_at = null, $plan = null, $sub_id = null)
     {
         $this->groups()->updateExistingPivot(4, ['ending_at' => $ending_at, 'plan' => $plan, 'sub_id' => $sub_id]);
-        // $this->updateOnSIB();
+        $this->updateOnSIB();
     }
 
     /**
@@ -235,13 +233,13 @@ class User extends Authenticatable
     public function addGold($ending_at = null, $plan = null, $sub_id = null)
     {
         $this->groups()->attach(5, ['ending_at' => $ending_at, 'plan' => $plan, 'sub_id' => $sub_id]);
-        // $this->updateOnSIB();
+        $this->updateOnSIB();
     }
 
     public function removeGold()
     {
         $this->groups()->detach(5);
-        // $this->updateOnSIB();
+        $this->updateOnSIB();
     }
 
     /**
@@ -252,6 +250,155 @@ class User extends Authenticatable
     public function updateGold($ending_at = null, $plan = null, $sub_id = null)
     {
         $this->groups()->updateExistingPivot(5, ['ending_at' => $ending_at, 'plan' => $plan, 'sub_id' => $sub_id]);
-        // $this->updateOnSIB();
+        $this->updateOnSIB();
+    }
+
+    public function updateOnSIB()
+    {
+      
+        $updateContact['email'] = $this->email;
+
+        $statut = $this->getStatut();
+        $data =
+            [
+            'USERID' => $this->id,
+            'PSEUDO' => $this->username,
+            'PREMIUM' => $this->isPremium(),
+            'LEVEL' => $statut->level,
+            'LAST_SEEN' => substr($this->last_activity, 0, 10),
+            'REGISTERED_AT' => substr($this->created_at, 0, 10),
+        ];
+        if ($statut->level != "membre") {
+
+            if ($statut->ending_at != null) {
+                $data['ENDING_AT'] = substr($statut->ending_at, 0, 10);
+            } else {
+                $data['ENDING_AT'] = "2099-01-01";
+            }
+
+            if (substr($statut->plan, 0, 4) == "plan") {
+                $data['MENSUEL'] = true;
+            } else {
+                $data['MENSUEL'] = false;
+            }
+
+            $data['PERIOD'] = substr($statut->ending_at, 0, 10);
+        }
+
+        $updateContact['attributes'] = $data;
+
+        $updateContact['emailBlacklisted'] = false;
+        $membre = $this->membre;
+
+        $curl = new \anlutro\cURL\cURL;
+        $endpoint = config("pokac.endpoint_n8n"); // prod
+
+        $url = "25a184bc-6090-411a-ad83-3e3bf6e8f7ca";
+
+        try
+        {
+            $response = $curl->post($endpoint.$url, $updateContact);
+            if( $response->statusCode == 400 ) $this->createOnSIB();
+        }
+        catch ( \Exception $e )
+        {
+            Log::info( 'Exception when calling updateonsib: ' . $e->getMessage() );
+            $this->createOnSIB();
+        }
+
+
+        $contactEmails['emails'] = [$this->email];
+            $contactEmails['nl'] = 4;
+            $url = "7832f38f-d7ed-49c0-838a-64ad3b586a1f";
+    
+            try
+            {
+                $response = $curl->post($endpoint.$url, $contactEmails);
+
+            }
+            catch ( \Exception $e )
+            {
+                Log::info( 'Exception when calling updateonsib add to nl 20: ' . $e->getMessage() );
+            }
+
+        $levels = ['silver' => 10, 'gold' => 11];
+        if ($statut->level != "membre") {
+
+        $contactEmails['emails'] = [$this->email];
+        $contactEmails['nl'] = $levels[$statut->level];
+        $url = "7832f38f-d7ed-49c0-838a-64ad3b586a1f";
+
+        try
+        {
+            $response = $curl->post($endpoint.$url, $contactEmails);
+
+        }
+        catch ( \Exception $e )
+        {
+            Log::info( 'Exception when calling updateonsib add to nl 20: ' . $e->getMessage() );
+        }
+        }
+
+        if ($membre and $membre->news == 0) {
+            //$updateContact['emailBlacklisted'] = true;
+            $news = false;
+        } else {
+            $news = true;
+        }
+// on ajoute à NEWSLETTER
+
+        if ($news) {
+            $contactEmails['emails'] = [$this->email];
+            $contactEmails['nl'] = 20;
+            $url = "7832f38f-d7ed-49c0-838a-64ad3b586a1f";
+    
+            try
+            {
+                $response = $curl->post($endpoint.$url, $contactEmails);
+    
+            }
+            catch ( \Exception $e )
+            {
+                Log::info( 'Exception when calling updateonsib add to nl 20: ' . $e->getMessage() );
+            }
+        } else {
+            $contactEmails['emails'] = [$this->email];
+            $contactEmails['nl'] = 20;
+            $url = "1a2b473f-c4e2-4a0f-9c11-aa1d27fa7fc3";
+
+            try {
+                $response = $curl->post($endpoint.$url, $contactEmails);
+            } catch (\Exception$e) {
+                \Log::info('Exception when removefromList: ' . $e->getMessage());
+
+            }
+        }
+
+        $listId = $this->getSIBLists();
+        //\Log::info($listId);
+        // betclic 12
+        // pmu 13
+        // unibet 5
+        // party 3
+
+        $SIBList = [3 => 8, 12 => 5, 5 => 7, 13 => 6];
+
+        foreach ($listId as $lid) {
+           
+            $contactEmails['emails'] = [$this->email];
+            $contactEmails['nl'] = $SIBList[$lid];
+            $url = "7832f38f-d7ed-49c0-838a-64ad3b586a1f";
+    
+            try
+            {
+                $response = $curl->post($endpoint.$url, $contactEmails);
+    
+            }
+            catch ( \Exception $e )
+            {
+                Log::info( 'Exception when calling updateonsib add to nl 20: ' . $e->getMessage() );
+            }
+        }
+
     }
 }

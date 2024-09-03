@@ -6,6 +6,8 @@ use App\Helpers\QueryHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AffiliationResource;
 use App\Models\Affiliation;
+use App\Models\Operator;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AdminAffiliationController extends Controller
@@ -89,6 +91,80 @@ class AdminAffiliationController extends Controller
             $query->where('zt_users.username', 'LIKE', '%' . $request->username . '%');
         }
         return $query;
+    }
+
+    public function postAffiliationStatut(Request $request)
+    {
+
+        $data = $request->all();
+        dd($data);
+        $idaffil = $data['idaffil'];
+        $newstatut = $data['astatut'];
+
+
+         if ($idaffil == '' or $idaffil == null) {
+            $retour['msg'] = 'id affiliation manquante'; 
+            return response()->json($retour, 400);
+         }
+
+         if ($newstatut == '' or $newstatut == null) {
+            $retour['msg'] = 'statut manquant'; 
+            return response()->json($retour, 400);
+          }
+
+         $affiliation = Affiliation::find($idaffil);
+
+         if (!$affiliation) {
+            $retour['msg'] = 'affiliation non trouve'; 
+            return response()->json($retour, 400);
+          }
+
+
+          $room = Operator::find($affiliation->room_id);
+          $user = User::find($affiliation->user_id);
+          $membre = $user->membre;
+
+          //Data Email
+          $datacom = array();
+          $datacom['username'] = $user->username;
+          $datacom['email'] = $user->email;
+          $datacom['room'] = $room->nom;
+          $datacom['pseudo_room'] = $affiliation->pseudo_room;
+
+          $affiliation->state = 0;
+          $affiliation->save();
+
+          //new affil
+          $newaffiliation = new Affiliation();
+          $newaffiliation->room_id = $affiliation->room_id;
+          $newaffiliation->user_id = $affiliation->user_id;
+          $newaffiliation->room = $affiliation->room;
+          $newaffiliation->pseudo_room = $affiliation->pseudo_room;
+          $newaffiliation->statut = $newstatut;
+          $newaffiliation->state = 1;
+          $newaffiliation->save(); 
+
+          if ($newstatut == 'Demande reçue') {$membre->SendMailAffiliation1($datacom);}
+
+          if ($newstatut == 'Demande en cours') {$membre->SendMailAffiliation2($datacom);}
+
+          if ($newstatut == 'Compte Affilié') {
+
+            $membre->SendMailAffiliation3($datacom);
+            $user->updateOnSIB();
+          
+          }
+
+          if ($newstatut == 'Compte non-affilié') {$membre->SendMailAffiliation4($datacom);}
+
+          if ($newstatut == 'Compte affiliable (Unibet)') {$membre->SendMailAffiliation6($datacom);}
+
+          if ($newstatut == 'Compte introuvable') {$membre->SendMailAffiliation5($datacom);}
+
+          if ($newstatut == 'Anomalie') {}
+
+          $retour['msg'] = $newaffiliation->id; 
+          return response()->json($retour, 200);
     }
 
     /**

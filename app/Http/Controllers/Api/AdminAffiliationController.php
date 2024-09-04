@@ -20,12 +20,15 @@ class AdminAffiliationController extends Controller
         $perPage = $request->input('itemsPerPage', 15);
 
         $query = Affiliation::query()
-            ->join('zt_users', 'pa_affiliations.user_id', '=', 'zt_users.id');
+            ->join('zt_users', 'pa_affiliations.user_id', '=', 'zt_users.id')
+            ->select('pa_affiliations.*');
 
         // sorting query
         if ($request->get('sortBy')) {
             $sortBy = json_decode($request->get('sortBy'));
             $query = $this->sortBy($query, $sortBy->key, $sortBy->order);
+        } else {
+            $query = $this->sortBy($query, 'id', 'desc');
         }
 
         // filters by columns
@@ -95,76 +98,75 @@ class AdminAffiliationController extends Controller
 
     public function postAffiliationStatut(Request $request)
     {
-
         $data = $request->all();
-        dd($data);
         $idaffil = $data['idaffil'];
         $newstatut = $data['astatut'];
 
-
-         if ($idaffil == '' or $idaffil == null) {
-            $retour['msg'] = 'id affiliation manquante'; 
+        if ($idaffil == '' or $idaffil == null) {
+            $retour['msg'] = 'id affiliation manquante';
             return response()->json($retour, 400);
-         }
+        }
 
-         if ($newstatut == '' or $newstatut == null) {
-            $retour['msg'] = 'statut manquant'; 
+        if ($newstatut == '' or $newstatut == null) {
+            $retour['msg'] = 'statut manquant';
             return response()->json($retour, 400);
-          }
+        }
 
-         $affiliation = Affiliation::find($idaffil);
+        $affiliation = Affiliation::find($idaffil);
 
-         if (!$affiliation) {
-            $retour['msg'] = 'affiliation non trouve'; 
+        if (!$affiliation) {
+            $retour['msg'] = 'affiliation non trouve';
             return response()->json($retour, 400);
-          }
+        }
 
+        $room = Operator::find($affiliation->room_id);
+        if (!$room) {
+            $retour['msg'] = 'Operator non trouve.';
+            return response()->json($retour, 400);
+        }
+        $user = User::find($affiliation->user_id);
+        $membre = $user->membre;
+        //Data Email
+        $datacom = array();
+        $datacom['username'] = $user->username;
+        $datacom['email'] = $user->email;
+        $datacom['room'] = $room->nom;
+        $datacom['pseudo_room'] = $affiliation->pseudo_room;
 
-          $room = Operator::find($affiliation->room_id);
-          $user = User::find($affiliation->user_id);
-          $membre = $user->membre;
+        $affiliation->state = 0;
+        $affiliation->save();
 
-          //Data Email
-          $datacom = array();
-          $datacom['username'] = $user->username;
-          $datacom['email'] = $user->email;
-          $datacom['room'] = $room->nom;
-          $datacom['pseudo_room'] = $affiliation->pseudo_room;
+        //new affil
+        $newaffiliation = new Affiliation();
+        $newaffiliation->room_id = $affiliation->room_id;
+        $newaffiliation->user_id = $affiliation->user_id;
+        $newaffiliation->room = $affiliation->room;
+        $newaffiliation->pseudo_room = $affiliation->pseudo_room;
+        $newaffiliation->statut = $newstatut;
+        $newaffiliation->state = 1;
+        $newaffiliation->save();
 
-          $affiliation->state = 0;
-          $affiliation->save();
+        //   if ($newstatut == 'Demande reçue') {$membre->SendMailAffiliation1($datacom);}
 
-          //new affil
-          $newaffiliation = new Affiliation();
-          $newaffiliation->room_id = $affiliation->room_id;
-          $newaffiliation->user_id = $affiliation->user_id;
-          $newaffiliation->room = $affiliation->room;
-          $newaffiliation->pseudo_room = $affiliation->pseudo_room;
-          $newaffiliation->statut = $newstatut;
-          $newaffiliation->state = 1;
-          $newaffiliation->save(); 
+        //   if ($newstatut == 'Demande en cours') {$membre->SendMailAffiliation2($datacom);}
 
-          if ($newstatut == 'Demande reçue') {$membre->SendMailAffiliation1($datacom);}
+        //   if ($newstatut == 'Compte Affilié') {
 
-          if ($newstatut == 'Demande en cours') {$membre->SendMailAffiliation2($datacom);}
+        //     $membre->SendMailAffiliation3($datacom);
+        //     $user->updateOnSIB();
 
-          if ($newstatut == 'Compte Affilié') {
+        //   }
 
-            $membre->SendMailAffiliation3($datacom);
-            $user->updateOnSIB();
-          
-          }
+        //   if ($newstatut == 'Compte non-affilié') {$membre->SendMailAffiliation4($datacom);}
 
-          if ($newstatut == 'Compte non-affilié') {$membre->SendMailAffiliation4($datacom);}
+        //   if ($newstatut == 'Compte affiliable (Unibet)') {$membre->SendMailAffiliation6($datacom);}
 
-          if ($newstatut == 'Compte affiliable (Unibet)') {$membre->SendMailAffiliation6($datacom);}
+        //   if ($newstatut == 'Compte introuvable') {$membre->SendMailAffiliation5($datacom);}
 
-          if ($newstatut == 'Compte introuvable') {$membre->SendMailAffiliation5($datacom);}
+        //   if ($newstatut == 'Anomalie') {}
 
-          if ($newstatut == 'Anomalie') {}
-
-          $retour['msg'] = $newaffiliation->id; 
-          return response()->json($retour, 200);
+        $retour['msg'] = $newaffiliation->id;
+        return response()->json($retour, 200);
     }
 
     /**

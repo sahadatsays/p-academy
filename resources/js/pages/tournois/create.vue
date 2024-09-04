@@ -32,7 +32,6 @@ const submitForm = async () => {
 
 const fetchOperators = async () => {
   const res = await $api('/admin/fetch/operator')
-
   operators.value = res
 }
 

@@ -1,6 +1,10 @@
 <script setup>
-const options = ref({});
+import { useRouter } from 'vue-router';
+import { useToast } from 'vue-toastification';
 
+
+const options = ref({});
+const toast = useToast()
 const affiliations = ref([]);
 const totalAffiliations = ref(0);
 const loading = ref(false);
@@ -16,6 +20,8 @@ const editableStatus = {
   "Compte introuvable": "red",
   Anomalie: "red",
 };
+
+const router = useRouter();
 
 const statusList = [
   {
@@ -78,15 +84,13 @@ const headers = [
 
 const fetchAffiliations = async () => {
   loading.value = true;
-
   const response = await $api("/admin/affiliations", {
     query: options.value,
     onResponseError({ response }) {
       console.log(response);
     },
   });
-  console.log(response);
-
+  
   // assign Response
   affiliations.value = response.data;
   totalAffiliations.value = response.meta.total;
@@ -95,9 +99,57 @@ const fetchAffiliations = async () => {
 };
 
 watch(options, fetchAffiliations, { deep: true });
+
+const isVisible = ref(false);
+const affialiteId = ref("");
+const affStatus = ref("")
+
+const editDialog = (id, status) => {
+    affialiteId.value = id
+    affStatus.value = status;
+    isVisible.value = !isVisible.value
+}
+
+const statusUpdate = async () => {
+    const res = await $api('/admin/affiliations/update-status', {
+        method: 'POST',
+        body: { idaffil: affialiteId.value, astatut: affStatus.value},
+        onResponseError({ response }) {
+            console.log(response);
+        }
+    })
+    toast.success('Status has been updated.')
+    isVisible.value = !isVisible.value
+    fetchAffiliations()
+}
+
 </script>
 
 <template>
+  <template>
+    <VDialog v-model="isVisible" width="500">
+      <!-- Dialog close btn -->
+      <DialogCloseBtn @click="isVisible = !isVisible" />
+
+      <!-- Dialog Content -->
+      <VCard>
+        <VCardText>
+            <AppSelect
+                :items="statusList"
+                item-title="text"
+                item-value="value"
+                v-model="affStatus"
+                placeholder="Select Status"
+            />
+        </VCardText>
+
+        <VCardText class="d-flex justify-end">
+          <VBtn @click="statusUpdate"> Update </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
+  </template>
+
   <div>
     <VCard title="Affiliations">
       <VCardText>
@@ -205,6 +257,13 @@ watch(options, fetchAffiliations, { deep: true });
         <template #item.username="{ item }">
           <div class="d-flex align-center">
             <span>{{ item.user.username }}</span>
+          </div>
+        </template>
+
+        <!-- status -->
+        <template #item.statut="{ item }">
+          <div class="d-flex align-center">
+            <VBtn variant="text" class="border-b" @click="editDialog(item.id, item.statut)">{{ item.statut }}</VBtn>
           </div>
         </template>
       </VDataTableServer>

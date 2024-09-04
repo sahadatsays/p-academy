@@ -14,6 +14,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'api'], function () {
             return new UserResource($request->user());
         });
 
+        Route::post('affiliations/update-status', [App\Http\Controllers\Api\AdminAffiliationController::class, 'postAffiliationStatut']);
         Route::get('get-profile', [App\Http\Controllers\API\Auth\AdminAuthController::class, 'getProfile'])->name('get.profile');
         Route::post('profile-update', [App\Http\Controllers\API\Auth\AdminAuthController::class, 'updateProfile'])->name('updateProfile');
         Route::put('members/status/{user}', [App\Http\Controllers\Api\AdminMemberController::class, 'updateStatus'])->name('member_status.update');

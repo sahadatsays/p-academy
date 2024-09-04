@@ -23,10 +23,13 @@ const headers = [
     title: 'Name',
     key: 'name',
   },
-
   {
     title: 'Parent',
     key: 'parent_name',
+  },
+  {
+    title: 'Type',
+    key: 'type',
   },
   {
     title: 'Articles',
@@ -60,6 +63,7 @@ const fetchData = async () => {
       console.log(response)
     },
   })
+console.log(response.data);
 
   // assign Response
   dataList.value = response.data 

@@ -114,30 +114,14 @@ onMounted(() => {
                 :error-messages="errors.name"
               />
             </VCol>
-
-            <!-- 👉 Title -->
-            <!--
-              <VCol
-              cols="12"
-              md="6"
-              >
-              <AppTextField
-              v-model="form.title"
-              label="Title"
-              placeholder="Write title"
-              :error-messages="errors.title"
-              />
-              </VCol> 
-            -->
-
-            <!-- 👉 type -->
+            <!-- 👉 Type  -->
             <VCol
               cols="12"
               md="6"
             >
               <AppSelect
                 v-model="form.type" 
-                label="Parent Tag"
+                label="Type"
                 :items="types"
                 :error-messages="errors.type"
                 item-value="name"

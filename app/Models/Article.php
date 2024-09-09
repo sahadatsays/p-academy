@@ -5,9 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Video;
 use App\Models\Coach;
-use App\Models\Tournoi;
+use App\Models\Forum\Topic;
 use Cocur\Slugify\Slugify;
 use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -158,8 +159,6 @@ class Article extends Model implements HasMedia
         }
     }
 
-
-
     // $id est l'id d'un tag
     //$tree est un tableau
     private function buildTreeTag($tree, $id, $lang)
@@ -236,7 +235,10 @@ class Article extends Model implements HasMedia
             $url    = str_replace('{id}', $this->id, $url);
             $url    = str_replace('{slug}', $this->slug, $url);
 
-            if (MLG) $url    = substr($this->lang, 0, 2) . '/' . $url;
+            if (config('ZT.multilang')) 
+            {
+                $url    = substr($this->lang, 0, 2) . '/' . $url;
+            }
             if ($this->urlsite) {
                 $oldurl = $this->urlsite->url;
                 // si url change
@@ -274,7 +276,7 @@ class Article extends Model implements HasMedia
     {
         $data = $this->customdata('tournoi_id')->first();
         if (!$data or $data->metavalue == null or $data->metavalue == 0 or !is_numeric($data->metavalue)) return false;
-        return Tournoi::find($data->metavalue);
+        return App\Models\Tournoi::find($data->metavalue);
     }
 
     public function acces()
@@ -304,7 +306,7 @@ class Article extends Model implements HasMedia
     public function getTopicId()
     {
 
-        $id = \Cache::remember('topic_' . $this->id, 10, function () {
+        $id = Cache::remember('topic_' . $this->id, 10, function () {
             $data = $this->customdata('topic_id')->first();
             if (!$data or $data->metavalue == null or $data->metavalue == 0) return false;
             return $data->metavalue;
@@ -321,7 +323,7 @@ class Article extends Model implements HasMedia
             $arr = explode('/', $data->metavalue);
             $topic_id = $arr[0];
         } else $topic_id = $data->metavalue;
-        return \App\Models\Forum\Topic::find($topic_id);
+        return Topic::find($topic_id);
     }
 
 

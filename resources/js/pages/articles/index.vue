@@ -216,7 +216,7 @@ watch(options, fetchData, { deep: true })
             <IconBtn>
               <VIcon icon="tabler-eye" />
             </IconBtn>
-            <IconBtn>
+            <IconBtn :to="{name: 'articles-edit-id', params: {id: item.id }}">
               <VIcon icon="tabler-pencil" />
             </IconBtn>
             <IconBtn @click="deleteAction(item.id)">

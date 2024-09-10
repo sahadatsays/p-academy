@@ -34,6 +34,16 @@ const headers = [
     key: 'indexPage',
   },
   {
+    title: 'Translation',
+    key: 'translation',
+    sortable: false,
+  },
+  {
+    title: 'NB Articles',
+    key: 'nbarticles',
+    sortable: false,
+  },
+  {
     title: 'Created At',
     key: 'createdAt',
   },
@@ -145,7 +155,7 @@ watch(options, fetchData, { deep: true })
                 outlined
               />
             </td>
-            <td colspan="7" />
+            <td colspan="9" />
           </tr>
         </template>
 

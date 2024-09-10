@@ -9,6 +9,7 @@ use App\Models\Language;
 use App\Models\Tag;
 use App\Models\TagTranslations;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AdminTagController extends ApiController
 {
@@ -19,7 +20,11 @@ class AdminTagController extends ApiController
     {
         $perPage = $request->input('itemsPerPage', 15);
 
-        $query = Tag::query();
+        $query = Tag::query()
+            ->leftJoin('zt_v_nbarticles_by_tag', 'zt_tags.id', '=', 'zt_v_nbarticles_by_tag.tag_id')
+            ->select(['zt_tags.*', 
+            DB::Raw('IFNULL(zt_v_nbarticles_by_tag.nbarticles,0) as nbarticles')
+        ]);
 
         // sorting query
         if ($request->get('sortBy')) {
@@ -38,7 +43,7 @@ class AdminTagController extends ApiController
         }
 
         // Pagination
-        $tags = $query->paginate($perPage);
+        $tags = $query->with('translations')->paginate($perPage);
 
         return TagResource::collection($tags);
     }
@@ -71,7 +76,7 @@ class AdminTagController extends ApiController
         }
 
         if ($request->get('name')) {
-            $query->where('name', 'LIKE', '%'. $request->name .'%');
+            $query->where('name', 'LIKE', '%' . $request->name . '%');
         }
 
         return $query;
@@ -118,7 +123,7 @@ class AdminTagController extends ApiController
 
         $traslation = TagTranslations::create($tagTranslationData);
 
-        $tag->refreshUrl( 'add tag' );
+        $tag->refreshUrl('add tag');
 
         return $this->sendResponse($tag, 'Tag has been created.');
     }
@@ -144,7 +149,6 @@ class AdminTagController extends ApiController
         $translation = $tag->translations()->first();
 
         return $this->sendResponse(['tag' => $tag, 'translation' => $translation], 'fetch tag');
-
     }
 
     /**
@@ -191,7 +195,7 @@ class AdminTagController extends ApiController
             TagTranslations::create($tagTranslationData);
         }
 
-        $tag->refreshUrl( 'add tag' );
+        $tag->refreshUrl('add tag');
 
         return $this->sendResponse($tag, 'Tag has been updated.');
     }

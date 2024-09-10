@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\QueryHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\TagResource;
+use App\Models\Article;
 use App\Models\Language;
 use App\Models\Tag;
 use App\Models\TagTranslations;
@@ -22,9 +23,10 @@ class AdminTagController extends ApiController
 
         $query = Tag::query()
             ->leftJoin('zt_v_nbarticles_by_tag', 'zt_tags.id', '=', 'zt_v_nbarticles_by_tag.tag_id')
-            ->select(['zt_tags.*', 
-            DB::Raw('IFNULL(zt_v_nbarticles_by_tag.nbarticles,0) as nbarticles')
-        ]);
+            ->select([
+                'zt_tags.*',
+                DB::Raw('IFNULL(zt_v_nbarticles_by_tag.nbarticles,0) as nbarticles')
+            ]);
 
         // sorting query
         if ($request->get('sortBy')) {
@@ -146,9 +148,9 @@ class AdminTagController extends ApiController
         if ($tag == null) {
             return $this->sendError('Tag not found.');
         }
-        $translation = $tag->translations()->first();
+        $translations = $tag->translations()->get();
 
-        return $this->sendResponse(['tag' => $tag, 'translation' => $translation], 'fetch tag');
+        return $this->sendResponse(['tag' => $tag, 'translations' => $translations], 'fetch tag');
     }
 
     /**
@@ -164,35 +166,50 @@ class AdminTagController extends ApiController
 
         $data = $request->validate([
             'name' => 'required|string',
-            'title' => 'required|string',
-            'lang' => 'required',
+            'view_name' => 'nullable|string',
+            'sort_by' => 'nullable',
+            'rules' => 'nullable',
+            'per_page' => 'nullable',
+            'parent_id' => 'nullable',
+            'pa_menu_hide' => 'nullable',
+            'order' => 'nullable',
+            'index_page' => 'nullable',
+            'in_url' => 'nullable',
         ]);
 
         $data['parent_id'] = $request->input('parent_id', 0) ?? 0;
         $data['view_name'] = 'blog.html';
         $data['in_url'] = $request->input('in_url') == "on" ? 1 : 0;
         $data['index_page'] = $request->input('index_page') == "on" ? 1 : 0;
-        $data['sort_by'] = 'publish_up desc';
-        $data['rules'] = 'admin';
-        $data['per_page'] = 15;
+        $data['sort_by'] = $request->input('sort_by')  ?? 'publish_up desc';
+        $data['rules'] = $request->input('rules') ?? 'admin';
+        $data['per_page'] = $request->input('per_page') ?? 15;
 
         $tag->update($data);
 
         // Tag Translations
-        $tagTranslationData = [
-            'tag_id'        => $tag->id,
-            'lang'          => $request->input('lang'),
-            'title'         => $request->input('title'),
-            'slug'          => str()->slug($request->input('title')),
-            'content1'      => $request->input('content1'),
-            'content2'      => $request->input('content2'),
-        ];
+        foreach ($request->input('translations') as $translation) {
 
-        $translation = $tag->translations()->where('lang', $request->input('lang'))->first();
-        if ($translation != null) {
-            $translation->update($tagTranslationData);
-        } else {
-            TagTranslations::create($tagTranslationData);
+            $tagTranslationData = [
+                // 'tag_id'        => $translation['id'],
+                'lang'          => $translation['lang'],
+                'title'         => $translation['title'],
+                'slug'          => str()->slug($translation['title']),
+                'content1'      => $translation['content1'],
+                'content2'      => $translation['content2'],
+                'metakeywords'      => $translation['metakeywords'],
+                'metadescription'      => $translation['metadescription'],
+                'page_title'      => $translation['page_title'],
+                'pa_menu_titre'      => $translation['pa_menu_titre'],
+            ];
+
+            $translation = $tag->translations()->where('lang', $translation['lang'])->first();
+
+            if ($translation != null) {
+                $translation->update($tagTranslationData);
+            } else {
+                TagTranslations::create($tagTranslationData);
+            }
         }
 
         $tag->refreshUrl('add tag');
@@ -205,6 +222,39 @@ class AdminTagController extends ApiController
      */
     public function destroy(string $id)
     {
-        //
+        $this->delete_childs($id);
+        return $this->sendResponse([], 'Deleted has been done.');
+    }
+
+    private function delete_childs($id)
+    {
+        $childs = Tag::where('parent_id', '=', $id)->get();
+        foreach ($childs as $c) {
+            $this->delete_childs($c->id);
+        }
+
+        $todelete = Tag::find($id);
+        // on del les urls mode blog
+        foreach ($todelete->translations() as $key) {
+            $key->urlsite()->delete();
+        }
+        // on del les trad
+        $todelete->translations()->delete();
+        // on stocke les ids des articles tagués pour pouvoir recalculer leur url après les avoir détagués
+        $recalc = array();
+        foreach ($todelete->articles as $a) {
+            $recalc[] = $a->id;
+        }
+
+        // on detag
+        $todelete->articles()->detach($id);
+
+
+        // on del le tag
+        $todelete->delete();
+        // on recaclule les URL des articles liés à ce tag
+        foreach ($recalc as $r) {
+            Article::find($r)->refreshUrl('Tag delete');
+        }
     }
 }

@@ -28,7 +28,7 @@ class TagResource extends JsonResource
             'updatedAt'     => Carbon::parse($this->updated_at)->toDateTimeString(),
             'parent'        => new TagResource($this->parent),
             'nbarticles'    => $this->nbarticles ?? 0,
-            'translation'   => Language::where('default_locale', $this->translations()->first()->lang)->first()->english_name ?? '',
+            'translation'   => Language::where('default_locale', $this->translations()->first()->lang ?? '')->first()->english_name ?? '',
             'languages'     => []
         ];
     }

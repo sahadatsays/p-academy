@@ -7,6 +7,12 @@ const loading = ref(false)
 const perPage = ref(0)
 const search = ref('')
 
+const confirmAlert = ref({
+  confirm: false,
+  actionUrl: '',
+  redirect: '',
+})
+
 // headers
 const headers = [
   {
@@ -50,6 +56,7 @@ const headers = [
   {
     title: 'Updated At',
     key: 'updatedAt',
+    sortable: false,
   },
   {
     title: '#',
@@ -76,10 +83,25 @@ const fetchData = async () => {
 }
 
 watch(options, fetchData, { deep: true })
+
+const deleteAction =  id => {
+  confirmAlert.value = {
+    confirm: true,
+    actionUrl: `/admin/tags/${id}`,
+  }
+}
+
 </script>
 
 <template>
   <div>
+    <!-- 👉 Confirm Dialog -->
+    <ConfirmDialog
+      v-model:isDialogVisible="confirmAlert.confirm"
+      :action-url="confirmAlert.actionUrl"
+      @update-list="fetchData"
+    />
+
     <VCard title="Tags">
       <VCardText>
         <VRow>
@@ -166,7 +188,7 @@ watch(options, fetchData, { deep: true })
               <VIcon icon="tabler-pencil" />
             </IconBtn>
             <IconBtn>
-              <VIcon icon="tabler-square-x" />
+              <VIcon icon="tabler-square-x" @click="deleteAction(item.id)"/>
             </IconBtn>
           </div>
         </template>

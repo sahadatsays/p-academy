@@ -4,7 +4,7 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-});
+})
 
 // headers
 const headers = [
@@ -36,12 +36,14 @@ const headers = [
     title: "crée le",
     key: "createdAt",
   },
-];
-
+]
 </script>
 
 <template>
   <VCard>
-    <v-data-table :headers="headers" :items="props.allTransfertPpa"></v-data-table>
+    <VDataTable
+      :headers="headers"
+      :items="props.allTransfertPpa"
+    />
   </VCard>
 </template>

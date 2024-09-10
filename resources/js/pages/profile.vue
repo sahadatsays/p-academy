@@ -77,7 +77,7 @@ onMounted(() => {
 
     <VCard title="Profile Edit">
       <template #append>
-        <div class="mt-n4 me-n2"/>
+        <div class="mt-n4 me-n2" />
       </template>
       <VCardText>
         <VForm @submit.prevent="submitForm">

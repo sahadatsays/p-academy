@@ -4,13 +4,16 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-});
+})
 
-console.log(props.commands);
+console.log(props.commands)
 </script>
 
 <template>
-  <v-table class="border" v-if="props.commands.length != 0">
+  <VTable
+    v-if="props.commands.length != 0"
+    class="border"
+  >
     <thead>
       <tr>
         <th>Id</th>
@@ -29,7 +32,9 @@ console.log(props.commands);
         <td>{{ command.created_at }}</td>
       </tr>
     </tbody>
-  </v-table>
+  </VTable>
 
-  <p v-else>Aucunes commandes</p>
+  <p v-else>
+    Aucunes commandes
+  </p>
 </template>

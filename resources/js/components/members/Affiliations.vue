@@ -4,11 +4,14 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-});
+})
 </script>
 
 <template>
-  <v-table class="border" v-if="props.affiliations.length != 0">
+  <VTable
+    v-if="props.affiliations.length != 0"
+    class="border"
+  >
     <thead>
       <tr>
         <th>room</th>
@@ -25,7 +28,9 @@ const props = defineProps({
         <td>{{ affiliation.createdAt }}</td>
       </tr>
     </tbody>
-  </v-table>
+  </VTable>
 
-  <p v-else>Aucunes affiliations</p>
+  <p v-else>
+    Aucunes affiliations
+  </p>
 </template>

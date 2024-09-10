@@ -1,19 +1,19 @@
-import { deepMerge } from "@antfu/utils";
-import { createVuetify } from "vuetify";
-import * as components from "vuetify/components";
-import * as directives from "vuetify/directives";
+import { deepMerge } from "@antfu/utils"
+import { createVuetify } from "vuetify"
+import * as components from "vuetify/components"
+import * as directives from "vuetify/directives"
 
-import { VBtn } from "vuetify/components/VBtn";
-import defaults from "./defaults";
-import { icons } from "./icons";
-import { staticPrimaryColor, staticPrimaryDarkenColor, themes } from "./theme";
-import { themeConfig } from "@themeConfig";
-import { en, fr } from "vuetify/locale";
+import { VBtn } from "vuetify/components/VBtn"
+import defaults from "./defaults"
+import { icons } from "./icons"
+import { staticPrimaryColor, staticPrimaryDarkenColor, themes } from "./theme"
+import { themeConfig } from "@themeConfig"
+import { en, fr } from "vuetify/locale"
 
 // Styles
-import { cookieRef } from "@/@layouts/stores/config";
-import "@core-scss/template/libs/vuetify/index.scss";
-import "vuetify/styles";
+import { cookieRef } from "@/@layouts/stores/config"
+import "@core-scss/template/libs/vuetify/index.scss"
+import "vuetify/styles"
 
 export default function (app) {
   const cookieThemeValues = {
@@ -25,7 +25,7 @@ export default function (app) {
             .value,
           "primary-darken-1": cookieRef(
             "lightThemePrimaryDarkenColor",
-            staticPrimaryDarkenColor
+            staticPrimaryDarkenColor,
           ).value,
         },
       },
@@ -34,14 +34,14 @@ export default function (app) {
           primary: cookieRef("darkThemePrimaryColor", staticPrimaryColor).value,
           "primary-darken-1": cookieRef(
             "darkThemePrimaryDarkenColor",
-            staticPrimaryDarkenColor
+            staticPrimaryDarkenColor,
           ).value,
         },
       },
     },
-  };
+  }
 
-  const optionTheme = deepMerge({ themes }, cookieThemeValues);
+  const optionTheme = deepMerge({ themes }, cookieThemeValues)
 
   const vuetify = createVuetify({
     lang: {
@@ -56,7 +56,7 @@ export default function (app) {
     theme: optionTheme,
     components,
     directives,
-  });
+  })
 
-  app.use(vuetify);
+  app.use(vuetify)
 }

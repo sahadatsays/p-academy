@@ -63,7 +63,8 @@ const fetchData = async () => {
       console.log(response)
     },
   })
-console.log(response.data);
+
+  console.log(response.data)
 
   // assign Response
   dataList.value = response.data 

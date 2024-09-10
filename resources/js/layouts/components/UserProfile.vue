@@ -19,7 +19,7 @@ const logout = async () => {
   // ℹ️ We had to remove abilities in then block because if we don't nav menu items mutation is visible while redirecting user to login page
 
   // Remove "userAbilities" from cookie
-//   useCookie('userAbilityRules').value = null
+  //   useCookie('userAbilityRules').value = null
 
   // Reset ability to initial ability
 //   ability.update([])
@@ -39,6 +39,7 @@ const userProfileList = [
     type: 'navItem',
     icon: 'tabler-settings',
     title: 'Settings',
+
     // to: {
     //   name: 'pages-account-settings-tab',
     //   params: { tab: 'account' },
@@ -48,6 +49,7 @@ const userProfileList = [
     type: 'navItem',
     icon: 'tabler-credit-card',
     title: 'Billing',
+
     // to: {
     //   name: 'pages-account-settings-tab',
     //   params: { tab: 'billing-plans' },
@@ -62,12 +64,14 @@ const userProfileList = [
     type: 'navItem',
     icon: 'tabler-currency-dollar',
     title: 'Pricing',
+
     // to: { name: 'pages-pricing' },
   },
   {
     type: 'navItem',
     icon: 'tabler-help-circle',
     title: 'FAQ',
+
     // to: { name: 'pages-faq' },
   },
   { type: 'divider' },

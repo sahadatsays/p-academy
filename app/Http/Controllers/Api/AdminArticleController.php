@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\LangHelper;
 use App\Helpers\QueryHelper;
-use App\Http\Controllers\Controller;
 use App\Http\Resources\ArticleResource;
 use App\Http\Resources\UserResource;
 use App\Models\Article;
+use App\Models\Media;
 use App\Models\Patag;
 use App\Models\Tag;
 use App\Models\Url301;
@@ -16,8 +16,8 @@ use Cocur\Slugify\Slugify;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Kelio\Zetatori\ArticleData;
 
 class AdminArticleController extends ApiController
 {
@@ -163,7 +163,7 @@ class AdminArticleController extends ApiController
         $tags_article = $article->patags()->pluck('id');
 
         $categories = Tag::query()
-        ->get(['id', 'name', 'parent_id']);
+            ->get(['id', 'name', 'parent_id']);
 
         $tags = Patag::query()
             ->with([
@@ -223,9 +223,10 @@ class AdminArticleController extends ApiController
         return $this->sendResponse($data, '');
     }
 
-    public function buildTree($items, $parentId = null) {
+    public function buildTree($items, $parentId = null)
+    {
         $branch = [];
-    
+
         foreach ($items as $item) {
             if ($item->parent_id == $parentId) {
                 $children = $this->buildTree($items, $item->id);
@@ -235,7 +236,7 @@ class AdminArticleController extends ApiController
                 $branch[] = $item;
             }
         }
-    
+
         return $branch;
     }
 
@@ -341,7 +342,8 @@ class AdminArticleController extends ApiController
         return $this->sendResponse($article, 'The article has been deleted');
     }
 
-    public function setTagToArticle(Request $request) {
+    public function setTagToArticle(Request $request)
+    {
         if (!$request->tag_id  || !$request->article_id) {
             return $this->sendError('Article or Tag id not found!');
         }
@@ -356,5 +358,43 @@ class AdminArticleController extends ApiController
         }
 
         return $this->sendResponse([], 'Attach and Detach Success !');
+    }
+
+    public function addMedia(Request $request, Article $article)
+    {
+        $validator = Validator::make($request->all(), [
+            'media' => 'required|mimes:jpg,jpeg,bmp,png,gif'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('', $validator->messages());
+        }
+
+        if ($request->hasFile('media')) {
+            $file = $request->file('media');
+            
+            $filename = time().'-'. $file->getClientOriginalName();
+            $fileSize = $file->getSize();
+            $fileType = $file->getMimeType();
+            $path = $file->storeAs('', $filename, 's3');
+            
+            $media = Media::create([
+                'size' => $fileSize,
+                'media_file_name' => $filename,
+                'linkto_type' => Article::class,
+                'linkto_id' => $article->id,
+                'media_content_type' => $fileType,
+                'media_file_size' => $fileSize,
+                'state' => 1,
+                'key' => 'index',
+                'user_id' => auth()->id()
+            ]);
+            
+            return $this->sendResponse([
+                'id' => $media->id,
+                'size' => $media->size,
+                // 'url' => Storage::disk('s3')->url($path),
+            ], 'Media has been uploaded.');
+        }
     }
 }

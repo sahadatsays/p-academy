@@ -14,6 +14,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'api'], function () {
             return new UserResource($request->user());
         });
 
+        Route::put('articles/set/media/{article}', [App\Http\Controllers\Api\AdminArticleController::class, 'addMedia']);
         Route::post('articles/set/tag', [App\Http\Controllers\Api\AdminArticleController::class, 'setTagToArticle']);
         Route::post('affiliations/update-status', [App\Http\Controllers\Api\AdminAffiliationController::class, 'postAffiliationStatut']);
         Route::get('get-profile', [App\Http\Controllers\API\Auth\AdminAuthController::class, 'getProfile'])->name('get.profile');

@@ -1,15 +1,15 @@
 <script setup>
-import { useRouter } from 'vue-router';
-import { useToast } from 'vue-toastification';
+import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 
 
-const options = ref({});
+const options = ref({})
 const toast = useToast()
-const affiliations = ref([]);
-const totalAffiliations = ref(0);
-const loading = ref(false);
-const perPage = ref(0);
-const search = ref("");
+const affiliations = ref([])
+const totalAffiliations = ref(0)
+const loading = ref(false)
+const perPage = ref(0)
+const search = ref("")
 
 const editableStatus = {
   "Demande reçue": "blue",
@@ -19,9 +19,9 @@ const editableStatus = {
   "Compte affiliable (Unibet)": "blue",
   "Compte introuvable": "red",
   Anomalie: "red",
-};
+}
 
-const router = useRouter();
+const router = useRouter()
 
 const statusList = [
   {
@@ -52,7 +52,7 @@ const statusList = [
     value: "Anomalie",
     text: "Anomalie",
   },
-];
+]
 
 // headers
 const headers = [
@@ -80,71 +80,77 @@ const headers = [
     title: "Date",
     key: "user.createdAt",
   },
-];
+]
 
 const fetchAffiliations = async () => {
-  loading.value = true;
+  loading.value = true
+
   const response = await $api("/admin/affiliations", {
     query: options.value,
     onResponseError({ response }) {
-      console.log(response);
+      console.log(response)
     },
-  });
+  })
   
   // assign Response
-  affiliations.value = response.data;
-  totalAffiliations.value = response.meta.total;
-  perPage.value = response.meta.per_page;
-  loading.value = false;
-};
+  affiliations.value = response.data
+  totalAffiliations.value = response.meta.total
+  perPage.value = response.meta.per_page
+  loading.value = false
+}
 
-watch(options, fetchAffiliations, { deep: true });
+watch(options, fetchAffiliations, { deep: true })
 
-const isVisible = ref(false);
-const affialiteId = ref("");
+const isVisible = ref(false)
+const affialiteId = ref("")
 const affStatus = ref("")
 
 const editDialog = (id, status) => {
-    affialiteId.value = id
-    affStatus.value = status;
-    isVisible.value = !isVisible.value
+  affialiteId.value = id
+  affStatus.value = status
+  isVisible.value = !isVisible.value
 }
 
 const statusUpdate = async () => {
-    const res = await $api('/admin/affiliations/update-status', {
-        method: 'POST',
-        body: { idaffil: affialiteId.value, astatut: affStatus.value},
-        onResponseError({ response }) {
-            console.log(response);
-        }
-    })
-    toast.success('Status has been updated.')
-    isVisible.value = !isVisible.value
-    fetchAffiliations()
-}
+  const res = await $api('/admin/affiliations/update-status', {
+    method: 'POST',
+    body: { idaffil: affialiteId.value, astatut: affStatus.value },
+    onResponseError({ response }) {
+      console.log(response)
+    },
+  })
 
+  toast.success('Status has been updated.')
+  isVisible.value = !isVisible.value
+  fetchAffiliations()
+}
 </script>
 
 <template>
   <template>
-    <VDialog v-model="isVisible" width="500">
+    <VDialog
+      v-model="isVisible"
+      width="500"
+    >
       <!-- Dialog close btn -->
       <DialogCloseBtn @click="isVisible = !isVisible" />
 
       <!-- Dialog Content -->
       <VCard>
         <VCardText>
-            <AppSelect
-                :items="statusList"
-                item-title="text"
-                item-value="value"
-                v-model="affStatus"
-                placeholder="Select Status"
-            />
+          <AppSelect
+            v-model="affStatus"
+            :items="statusList"
+            item-title="text"
+            item-value="value"
+            placeholder="Select Status"
+          />
         </VCardText>
 
         <VCardText class="d-flex justify-end">
-          <VBtn @click="statusUpdate"> Update </VBtn>
+          <VBtn @click="statusUpdate">
+            Update
+          </VBtn>
         </VCardText>
       </VCard>
     </VDialog>
@@ -154,12 +160,21 @@ const statusUpdate = async () => {
     <VCard title="Affiliations">
       <VCardText>
         <VRow>
-          <VCol cols="12" md="6">
+          <VCol
+            cols="12"
+            md="6"
+          >
             <VBtn>Importer PPA</VBtn>
-            <VBtn class="ml-3">Importer PPA</VBtn>
+            <VBtn class="ml-3">
+              Importer PPA
+            </VBtn>
           </VCol>
 
-          <VCol cols="12" offset-md="2" md="4">
+          <VCol
+            cols="12"
+            offset-md="2"
+            md="4"
+          >
             <AppTextField
               v-model="search"
               density="compact"
@@ -263,7 +278,13 @@ const statusUpdate = async () => {
         <!-- status -->
         <template #item.statut="{ item }">
           <div class="d-flex align-center">
-            <VBtn variant="text" class="border-b" @click="editDialog(item.id, item.statut)">{{ item.statut }}</VBtn>
+            <VBtn
+              variant="text"
+              class="border-b"
+              @click="editDialog(item.id, item.statut)"
+            >
+              {{ item.statut }}
+            </VBtn>
           </div>
         </template>
       </VDataTableServer>

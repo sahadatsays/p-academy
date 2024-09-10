@@ -68,13 +68,13 @@ class Article extends Model implements HasMedia
 
     public function palikes()
     {
-        return $this->belongsToMany('\Kelio\Zetatori\User', 'pa_articles_likes', 'article_id', 'user_id');
+        return $this->belongsToMany(User::class, 'pa_articles_likes', 'article_id', 'user_id');
     }
 
 
     public function data()
     {
-        return $this->HasMany('\Kelio\Zetatori\ArticleData');
+        return $this->HasMany(ArticleData::class);
     }
 
 
@@ -103,7 +103,7 @@ class Article extends Model implements HasMedia
 
     public function medias()
     {
-        return $this->morphMany('\Kelio\Zetatori\Media', 'linkto')->where('state', '=', 1);
+        return $this->morphMany(Media::class, 'linkTo')->where('state', '=', 1);
     }
 
     public function translatedArticles()

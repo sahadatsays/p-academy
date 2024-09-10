@@ -4,11 +4,14 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-});
+})
 </script>
 
 <template>
-  <v-table class="border" v-if="props.payments.length != 0">
+  <VTable
+    v-if="props.payments.length != 0"
+    class="border"
+  >
     <thead>
       <tr>
         <th>Id</th>
@@ -28,13 +31,15 @@ const props = defineProps({
         <td>{{ payment.item_id }}</td>
         <td>{{ payment.prix }}</td>
         <td>
-            <span v-if="payment.state == 1">payé</span>
-            <span v-else>échoué</span>
+          <span v-if="payment.state == 1">payé</span>
+          <span v-else>échoué</span>
         </td>
         <td>{{ payment.created_at }}</td>
       </tr>
     </tbody>
-  </v-table>
+  </VTable>
 
-  <p v-else>Aucunes commandes</p>
+  <p v-else>
+    Aucunes commandes
+  </p>
 </template>

@@ -16,7 +16,7 @@ class CheckAdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::guard('api')->check() && !auth()->user()->isAdmin() && !auth()->user()->isRoot()) {
+        if (!Auth::guard('api')->check() && !auth('api')->user()->isAdmin() && !auth('api')->user()->isRoot()) {
             if ($request->expectsJson()) {
                 return response('Unauthorized Access.', 401);
             }

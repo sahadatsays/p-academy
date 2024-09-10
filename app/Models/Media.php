@@ -5,12 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class Media extends Model
 {
     use HasFactory;
 
     protected $table = 'zt_medias';
+    protected $guarded = ['id'];
+    protected $appends = ['url'];
 
     public function linkTo()
     {
@@ -29,5 +32,9 @@ class Media extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getUrlAttribute() {
+        return Storage::disk('s3')->url($this->media_file_name);
     }
 }

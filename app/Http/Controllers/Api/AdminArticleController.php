@@ -111,7 +111,7 @@ class AdminArticleController extends ApiController
      */
     public function store(Request $request)
     {
-        $user = auth()->user();
+        $user = auth('api')->user();
 
         $data = $request->validate([
             'title' => 'required|string',
@@ -218,7 +218,8 @@ class AdminArticleController extends ApiController
             'tags_article' => $tags_article,
             'categoriesTree' => $this->buildTree($categories),
             'lang_actives' => $lang_actives,
-            'root_url' => url('/')
+            'root_url' => url('/'),
+            'medias' => $article->medias
         ];
         return $this->sendResponse($data, '');
     }
@@ -250,13 +251,14 @@ class AdminArticleController extends ApiController
             'title' => 'required|max:150',
             'content' => 'required',
         );
-
+        
         $validation = Validator::make($request->all(), $rules);
 
         if ($validation->fails()) {
             return $this->sendError('Form Error', $validation->messages());
         }
-        $article = Article::query()->with(['urlsite'])->first($id);
+        
+        $article = Article::findOrFail($id);
         $reason = array();
         if ($article->lang != $request->input('lang')) $reason[] = 'lang change';
         if ($article->slug != $request->input('slug')) $reason[] = 'slug change';
@@ -360,11 +362,15 @@ class AdminArticleController extends ApiController
         return $this->sendResponse([], 'Attach and Detach Success !');
     }
 
-    public function addMedia(Request $request, Article $article)
+    public function addMedia(Request $request)
     {
+        
         $validator = Validator::make($request->all(), [
-            'media' => 'required|mimes:jpg,jpeg,bmp,png,gif'
+            'media' => 'required|mimes:jpg,jpeg,bmp,png,gif',
+            'article_id' => 'required'
         ]);
+
+        $article = Article::findOrFail($request->article_id);
 
         if ($validator->fails()) {
             return $this->sendError('', $validator->messages());
@@ -380,6 +386,7 @@ class AdminArticleController extends ApiController
             
             $media = Media::create([
                 'size' => $fileSize,
+                'media_updated_at' => now(),
                 'media_file_name' => $filename,
                 'linkto_type' => Article::class,
                 'linkto_id' => $article->id,
@@ -387,14 +394,30 @@ class AdminArticleController extends ApiController
                 'media_file_size' => $fileSize,
                 'state' => 1,
                 'key' => 'index',
-                'user_id' => auth()->id()
+                'user_id' => Auth::user()->id
             ]);
             
             return $this->sendResponse([
                 'id' => $media->id,
-                'size' => $media->size,
-                // 'url' => Storage::disk('s3')->url($path),
+                'size' => $media->media_file_size,
+                'path' => $path
             ], 'Media has been uploaded.');
         }
+    }
+
+    public function mediaKeyChange(Request $request)
+    {
+        Media::findOrFail($request->media_id)->update(['key' => $request->key]);
+        return $this->sendResponse([], 'Media key has been changed!');
+    }
+
+    public function fetchArticleMedias (Article $article) {
+        return $this->sendResponse($article->medias, '');
+    }
+    
+    public function deleteMedia(Media $media) {
+        // Storage::disk('s3')->delete($media->media_file_name);
+        $media->update(['state' => -1]);
+        return $this->sendResponse([], 'Medias been deleted!');
     }
 }

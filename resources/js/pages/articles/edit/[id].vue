@@ -3,101 +3,151 @@ const form = ref({
   lang: "fr_FR",
   state: 0,
   content: "",
-})
+});
 
-const route = useRoute("article-edit-id")
+const route = useRoute("article-edit-id");
 
-const langs = ref([])
-const errors = ref([])
-const hasError = ref(false)
-const error = ref("")
-const successMessage = ref("")
-const hasSuccess = ref(false)
-const mediaLoading = ref(false)
-const categoryTree = ref([])
-const selectedCategories = ref([])
+const langs = ref([]);
+const errors = ref([]);
+const hasError = ref(false);
+const error = ref("");
+const successMessage = ref("");
+const hasSuccess = ref(false);
+const mediaLoading = ref(false);
+const categoryTree = ref([]);
+const selectedCategories = ref([]);
+const selectedFile = ref(null);
+const articleMedias = ref([]);
 
-const getEditData = async id => {
-  const response = await $api(`/admin/articles/${id}/edit`)
-  const data = response.data
-  const { article } = data
+const getEditData = async (id) => {
+  const response = await $api(`/admin/articles/${id}/edit`);
+  const data = response.data;
+  const { article } = data;
 
-  form.value.title = article.title
-  form.value.content = article.content
-  form.value.id = article.id
-  form.value.publish_down = article.publish_down
-  form.value.publish_up = article.publish_up
-  form.value.view_name = article.view_name
-  form.value.state = article.state
-  form.value.order = article.order
-  form.value.rules = article.rules
-  form.value.group_lang_id = article.group_lang_id
-  form.value.metakeywords = article.metakeywords
-  form.value.metadescription = article.metadescription
-  form.value.user_id = article.user_id
-  form.value.page_title = article.page_title
-  form.value.slug = article.slug
-  form.value.root_url = data.root_url
-  form.value.active_url = article.urlsite?.url
+  form.value.title = article.title;
+  form.value.content = article.content;
+  form.value.id = article.id;
+  form.value.publish_down = article.publish_down;
+  form.value.publish_up = article.publish_up;
+  form.value.view_name = article.view_name;
+  form.value.state = article.state;
+  form.value.order = article.order;
+  form.value.rules = article.rules;
+  form.value.group_lang_id = article.group_lang_id;
+  form.value.metakeywords = article.metakeywords;
+  form.value.metadescription = article.metadescription;
+  form.value.user_id = article.user_id;
+  form.value.page_title = article.page_title;
+  form.value.slug = article.slug;
+  form.value.root_url = data.root_url;
+  form.value.active_url = article.urlsite?.url;
+  articleMedias.value = data.medias;
 
   //   other set
-  selectedCategories.value = data.article_categories
-  categoryTree.value = data.categoriesTree
-  console.log(article)
-}
+  selectedCategories.value = data.article_categories;
+  categoryTree.value = data.categoriesTree;
+  console.log(data.medias);
+};
 
 onMounted(() => {
-  getEditData(route.params.id)
-})
+  getEditData(route.params.id);
+});
 
 const submitForm = async () => {
   const response = await $api(`/admin/articles/${route.params.id}`, {
     method: "PUT",
     body: form.value,
     onResponseError({ response }) {
-      errors.value = response._data.errors
-      error.value = response._data.message
-      hasError.value = true
+      errors.value = response._data.errors;
+      error.value = response._data.message;
+      hasError.value = true;
     },
-  })
+  });
 
-  errors.value = {}
-  successMessage.value = response.message
-  hasSuccess.value = response.success
+  errors.value = {};
+  successMessage.value = response.message;
+  hasSuccess.value = response.success;
 
   //   router.push('/articles')
-}
+};
 
 const fetchLangs = async () => {
-  const res = await $api("/admin/fetch/langs")
+  const res = await $api("/admin/fetch/langs");
 
-  langs.value = res
-}
+  langs.value = res;
+};
 
 onMounted(() => {
-  fetchLangs()
-})
+  fetchLangs();
+});
 
+const currentTab = ref("content");
 
-const currentTab = ref("content")
+const fileUpload = async (event) => {
+  mediaLoading.value = true;
+  const file = event.target.files[0];
+
+  const formData = new FormData();
+  formData.append("media", file);
+  formData.append("article_id", route.params.id);
+
+  const options = {
+    method: "POST",
+    body: formData,
+    onResponseError({ response }) {
+      errors.value = response._data.errors;
+      error.value = response._data.message;
+      hasError.value = true;
+      mediaLoading.value = false;
+    },
+  };
+
+  const res = await $api(`/admin/articles/set/media`, options);
+
+  mediaLoading.value = false;
+  fetchMedias();
+};
+
+const fetchMedias = async () => {
+    const res = await $api(`/admin/articles/fetch/medias/${route.params.id}`, {
+        onResponseError({ response }) {
+            console.log(response);
+        }
+    })
+    articleMedias.value = res.data
+}
+
+const handleMediaKey = async (event, id) => {
+  const option = {
+    method: "POST",
+    body: { key: event, media_id: id },
+    onResponseError({ response }) {
+      console.log(response);
+    },
+  };
+  const res = await $api('/admin/articles/set/media/key', option);
+  fetchMedias();
+};
+const deleteMedia = async (id) => {
+    mediaLoading.value = true
+    const res = await $api(`/admin/articles/delete/media/${id}`, {
+        onResponseError({ response }) {
+      console.log(response);
+    },
+    })
+    mediaLoading.value = false
+    fetchMedias();
+}
 </script>
 
 <template>
   <div>
-    <VSnackbar
-      v-model="hasSuccess"
-      location="top end"
-      color="success"
-    >
+    <VSnackbar v-model="hasSuccess" location="top end" color="success">
       <VIcon icon="tabler-exclamation-circle" />
       {{ successMessage }}
     </VSnackbar>
 
-    <VSnackbar
-      v-model="hasError"
-      location="top end"
-      color="error"
-    >
+    <VSnackbar v-model="hasError" location="top end" color="error">
       <VIcon icon="tabler-exclamation-circle" />
       {{ error }}
     </VSnackbar>
@@ -106,11 +156,7 @@ const currentTab = ref("content")
       <template #append>
         <div class="mt-n4 me-n2">
           <VBtn :to="{ name: 'articles' }">
-            <VIcon
-              variant="tonal"
-              icon="tabler-list"
-              start
-            />
+            <VIcon variant="tonal" icon="tabler-list" start />
             Articles
           </VBtn>
         </div>
@@ -131,10 +177,7 @@ const currentTab = ref("content")
             <VWindowItem value="content">
               <VRow>
                 <!-- 👉 Languages -->
-                <VCol
-                  cols="12"
-                  md="2"
-                >
+                <VCol cols="12" md="2">
                   <AppSelect
                     v-model="form.lang"
                     label="Language"
@@ -147,10 +190,7 @@ const currentTab = ref("content")
                 </VCol>
 
                 <!-- 👉 Title -->
-                <VCol
-                  cols="12"
-                  md="10"
-                >
+                <VCol cols="12" md="10">
                   <AppTextField
                     v-model="form.title"
                     label="Title"
@@ -159,10 +199,7 @@ const currentTab = ref("content")
                   />
                 </VCol>
 
-                <VCol
-                  cols="12"
-                  md="6"
-                >
+                <VCol cols="12" md="6">
                   <AppTextField
                     v-model="form.page_title"
                     label="Page Title"
@@ -173,9 +210,7 @@ const currentTab = ref("content")
 
                 <!-- Content -->
                 <VCol cols="12">
-                  <VLabel class="mb-2">
-                    Content
-                  </VLabel>
+                  <VLabel class="mb-2"> Content </VLabel>
                   <TiptapEditor
                     v-model="form.content"
                     :model-value="form.content"
@@ -185,20 +220,14 @@ const currentTab = ref("content")
                 </VCol>
               </VRow>
               <VRow>
-                <VCol
-                  cols="12"
-                  md="6"
-                >
+                <VCol cols="12" md="6">
                   <AppTextarea
                     v-model="form.metakeywords"
                     label="Meta Keywords"
                     placeholder="Write meta keywords"
                   />
                 </VCol>
-                <VCol
-                  cols="12"
-                  md="6"
-                >
+                <VCol cols="12" md="6">
                   <AppTextarea
                     v-model="form.metadescription"
                     label="Meta Description"
@@ -209,10 +238,7 @@ const currentTab = ref("content")
             </VWindowItem>
             <VWindowItem value="properties">
               <VRow>
-                <VCol
-                  cols="12"
-                  md="3"
-                >
+                <VCol cols="12" md="3">
                   <AppSelect
                     v-model="form.state"
                     label="State"
@@ -227,10 +253,7 @@ const currentTab = ref("content")
                   />
                 </VCol>
 
-                <VCol
-                  cols="12"
-                  md="3"
-                >
+                <VCol cols="12" md="3">
                   <AppSelect
                     v-model="form.author"
                     label="Author"
@@ -242,10 +265,7 @@ const currentTab = ref("content")
                   />
                 </VCol>
 
-                <VCol
-                  cols="12"
-                  md="3"
-                >
+                <VCol cols="12" md="3">
                   <AppTextField
                     v-model="form.view_name"
                     label="View Name"
@@ -254,10 +274,7 @@ const currentTab = ref("content")
                   />
                 </VCol>
 
-                <VCol
-                  cols="12"
-                  md="3"
-                >
+                <VCol cols="12" md="3">
                   <AppSelect
                     v-model="form.rules"
                     label="Rules"
@@ -274,10 +291,7 @@ const currentTab = ref("content")
                   />
                 </VCol>
 
-                <VCol
-                  cols="12"
-                  md="3"
-                >
+                <VCol cols="12" md="3">
                   <AppTextField
                     v-model="form.order"
                     type="number"
@@ -286,10 +300,7 @@ const currentTab = ref("content")
                     :error-messages="errors.order"
                   />
                 </VCol>
-                <VCol
-                  cols="12"
-                  md="3"
-                >
+                <VCol cols="12" md="3">
                   <AppTextField
                     v-model="form.group_lang_id"
                     type="number"
@@ -298,10 +309,7 @@ const currentTab = ref("content")
                     :error-messages="errors.group_lang_id"
                   />
                 </VCol>
-                <VCol
-                  cols="12"
-                  md="2"
-                >
+                <VCol cols="12" md="2">
                   <AppDateTimePicker
                     v-model="form.publish_up"
                     label="Start Publication"
@@ -315,10 +323,7 @@ const currentTab = ref("content")
                     }"
                   />
                 </VCol>
-                <VCol
-                  cols="12"
-                  md="2"
-                >
+                <VCol cols="12" md="2">
                   <AppDateTimePicker
                     v-model="form.publish_down"
                     label="Start Publication"
@@ -336,17 +341,40 @@ const currentTab = ref("content")
             </VWindowItem>
             <VWindowItem value="medias">
               <VRow>
-                <VCol
-                  cols="12"
-                  md="6"
-                >
+                <VCol cols="12" md="6">
                   <VFileInput
-                    v-model="file"
+                    show-size
                     :loading="mediaLoading"
                     color="primary"
                     label="File input"
                     variant="outlined"
+                    @change="fileUpload"
                   />
+                </VCol>
+              </VRow>
+              <VRow>
+                <VCol cols="12" md="3" v-for="(media, index) in articleMedias">
+                  <VCard>
+                    <div class="pa-1">
+                      <VSelect
+                        density="compact"
+                        :items="[
+                          { label: 'Index', key: 'index' },
+                          { label: 'Gallery', key: 'gallery' },
+                          { label: 'Module', key: 'module' },
+                          { label: 'Title', key: 'title' },
+                        ]"
+                        item-title="label"
+                        item-value="key"
+                        :model-value="media.key"
+                        @update:modelValue="handleMediaKey($event, media.id)"
+                      />
+                    </div>
+                    <VImg :src="media.url" :alt="media.media_file_name" />
+                    <IconBtn :disabled="mediaLoading" size="small" @click="deleteMedia(media.id)">
+                        <VIcon size="24" icon="tabler-trash"/>
+                    </IconBtn>
+                  </VCard>
                 </VCol>
               </VRow>
             </VWindowItem>
@@ -359,7 +387,7 @@ const currentTab = ref("content")
                     :category="category"
                     :article-id="route.params.id"
                     :selected-categories="selectedCategories"
-                    @update:selected-categories="selectedCategories= $event"
+                    @update:selected-categories="selectedCategories = $event"
                   />
                 </VCol>
               </VRow>
@@ -373,10 +401,7 @@ const currentTab = ref("content")
             </VWindowItem>
             <VWindowItem value="seo-status">
               <VRow>
-                <VCol
-                  cols="12"
-                  md="6"
-                >
+                <VCol cols="12" md="6">
                   <AppTextField
                     v-model="form.slug"
                     label="Slug"
@@ -384,10 +409,7 @@ const currentTab = ref("content")
                     :error-messages="errors.slug"
                   />
                 </VCol>
-                <VCol
-                  cols="12"
-                  md="6"
-                >
+                <VCol cols="12" md="6">
                   <AppTextField
                     v-model="form.root_url"
                     label="Root"
@@ -395,10 +417,7 @@ const currentTab = ref("content")
                     :error-messages="errors.root_url"
                   />
                 </VCol>
-                <VCol
-                  cols="12"
-                  md="12"
-                >
+                <VCol cols="12" md="12">
                   <AppTextField
                     v-model="form.active_url"
                     label="Active URL"
@@ -406,10 +425,7 @@ const currentTab = ref("content")
                     :error-messages="errors.active_url"
                   />
                 </VCol>
-                <VCol
-                  cols="12"
-                  md="12"
-                >
+                <VCol cols="12" md="12">
                   <AppTextField
                     v-model="form.old_url"
                     label="Old URL"
@@ -429,15 +445,8 @@ const currentTab = ref("content")
           </VWindow>
         </VCardText>
         <VCardActions>
-          <VBtn
-            variant="flat"
-            color="primary"
-            type="submit"
-          >
-            <VIcon
-              icon="tabler-device-floppy"
-              class="mr-1"
-            />
+          <VBtn variant="flat" color="primary" type="submit">
+            <VIcon icon="tabler-device-floppy" class="mr-1" />
             Save Change
           </VBtn>
         </VCardActions>

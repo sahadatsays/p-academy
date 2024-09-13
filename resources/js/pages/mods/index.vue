@@ -1,84 +1,116 @@
 <script setup>
-const options = ref({})
+const options = ref({});
 
-const dataList = ref([])
-const totalData = ref(0)
-const loading = ref(false)
-const perPage = ref(0)
-const search = ref('')
+const dataList = ref([]);
+const totalData = ref(0);
+const loading = ref(false);
+const perPage = ref(0);
+const search = ref("");
+const successMessage = ref('')
+const hasSuccess = ref(false);
 
 const confirmAlert = ref({
   confirm: false,
-  actionUrl: '',
-  redirect: '',
-})
+  actionUrl: "",
+  redirect: "",
+});
 
 // headers
 const headers = [
   {
-    title: 'ID',
-    key: 'id',
+    title: "ID",
+    key: "id",
   },
   {
-    title: 'Name',
-    key: 'name',
+    title: "Name",
+    key: "name",
   },
   {
-    title: 'Position',
-    key: 'position',
+    title: "Position",
+    key: "position",
   },
   {
-    title: 'Order',
-    key: 'order',
+    title: "Order",
+    key: "order",
   },
   {
-    title: 'Status',
-    key: 'status',
+    title: "Rules",
+    key: "rules",
   },
   {
-    title: 'Created At',
-    key: 'createdAt',
+    title: "Translation",
+    key: "translation",
   },
   {
-    title: 'Updated At',
-    key: 'updatedAt',
+    title: "Status",
+    key: "status",
   },
   {
-    title: '#',
-    key: 'actions',
+    title: "Created At",
+    key: "createdAt",
+  },
+  {
+    title: "Updated At",
+    key: "updatedAt",
+  },
+  {
+    title: "#",
+    key: "actions",
     sortable: false,
   },
-]
+];
 
 const fetchData = async () => {
-  loading.value = true
+  loading.value = true;
 
-  const response = await $api('/admin/modules', {
+  const response = await $api("/admin/modules", {
     query: options.value,
     onResponseError({ response }) {
-      console.log(response)
+      console.log(response);
     },
-  })
+  });
 
   // assign Response
-  dataList.value = response.data 
-  totalData.value = response.meta.total
-  perPage.value = response.meta.per_page
-  loading.value = false
-}
+  dataList.value = response.data;
+  totalData.value = response.meta.total;
+  perPage.value = response.meta.per_page;
+  loading.value = false;
+};
 
-const deleteAction =  id => {
+const deleteAction = (id) => {
   confirmAlert.value = {
     confirm: true,
     actionUrl: `/admin/modules/${id}`,
-  }
-}
+  };
+};
 
-watch(options, fetchData, { deep: true })
+const changeStatus = async (id) => {
+  const res = await $api(`/admin/modules/publish/${id}`, {
+    onResponseError({ response }) {
+      console.log(response);
+    },
+  });
+
+  successMessage.value = res.message
+  hasSuccess.value = res.success
+
+  fetchData()
+};
+
+watch(options, fetchData, { deep: true });
 </script>
 
 <template>
   <div>
+    <VSnackbar
+      v-model="hasSuccess"
+      location="top end"
+      color="success"
+    >
+      <VIcon icon="tabler-exclamation-circle" />
+      {{ successMessage }}
+    </VSnackbar>
+
     <!-- 👉 Confirm Dialog -->
     <ConfirmDialog
       v-model:isDialogVisible="confirmAlert.confirm"
@@ -89,28 +121,15 @@ watch(options, fetchData, { deep: true })
     <VCard title="Modules">
       <VCardText>
         <VRow>
-          <VCol
-            cols="12"
-            md="2"
-          >
+          <VCol cols="12" md="2">
             <div>
-              <VBtn
-                block
-                :to="{ name: 'mods-create' }"
-              >
-                <VIcon 
-                  icon="tabler-plus"
-                  start
-                />
-                New Module 
+              <VBtn block :to="{ name: 'mods-create' }">
+                <VIcon icon="tabler-plus" start />
+                New Module
               </VBtn>
             </div>
           </VCol>
-          <VCol
-            cols="12"
-            offset-md="6"
-            md="4"
-          >
+          <VCol cols="12" offset-md="6" md="4">
             <AppTextField
               v-model="search"
               placeholder="Search ..."
@@ -119,7 +138,7 @@ watch(options, fetchData, { deep: true })
               hide-details
               dense
               outlined
-            /> 
+            />
           </VCol>
         </VRow>
       </VCardText>
@@ -147,11 +166,11 @@ watch(options, fetchData, { deep: true })
                 hide-details
                 dense
                 outlined
-                style="width: 5rem;"
-              /> 
+                style="width: 5rem"
+              />
             </td>
             <td>
-              <AppTextField 
+              <AppTextField
                 v-model="options.name"
                 append-inner-icon="tabler-search"
                 density="compact"
@@ -163,6 +182,15 @@ watch(options, fetchData, { deep: true })
             </td>
             <td colspan="8" />
           </tr>
+        </template>
+
+        <template #item.status="{ item }">
+          <div>
+            <VCheckbox
+              :model-value="item.status ? true : false"
+              @update:modelValue="changeStatus(item.id)"
+            />
+          </div>
         </template>
 
         <!-- actions -->

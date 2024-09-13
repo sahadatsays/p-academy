@@ -204,4 +204,23 @@ class AdminModuleController extends ApiController
         $module->delete();
         return $this->sendResponse(null, 'Module has been deleted!');
     }
+
+    public function publish (Module $module)
+    {
+        if ( $module->state == 0 ) {
+            $module->state = 1;
+            $message = 'Votre module a été publié';
+        }
+        elseif ( $module->state == 1 ) {
+            $module->state = 0;
+            $module->save();
+            $message = 'Votre module a été dépublié';
+        } elseif ( $module->state == 2 ) {
+            $module->state = 1;
+            $message = 'Votre module a été publié';
+        }
+        $module->save();
+
+        return $this->sendResponse($module, $message);
+    }
 }

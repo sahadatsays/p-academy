@@ -6,8 +6,11 @@ use App\Helpers\QueryHelper;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ModuleResource;
+use App\Models\Language;
 use App\Models\Module;
+use App\Models\ModuleTranslations;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class AdminModuleController extends ApiController
 {
@@ -92,7 +95,7 @@ class AdminModuleController extends ApiController
 
         // new module
         $module = Module::create([
-            'name' => $data['name'], 
+            'name' => $data['name'],
             'position' => $data['position'] ?? '',
             'state' => $data['status'],
             'show_title' => $data['show_title'] ?? 0,
@@ -136,7 +139,7 @@ class AdminModuleController extends ApiController
         }
 
         $data['module'] = new ModuleResource($module);
-        $data['moduleTranslation'] = $module->translations()->first();
+        $data['moduleTranslations'] = $module->translations;
 
         return $this->sendResponse($data, 'Module found!');
     }
@@ -152,39 +155,24 @@ class AdminModuleController extends ApiController
         }
 
         $data = $request->validate([
-            'title' => 'required|string',
             'name' => 'required|string',
             'position' => 'nullable|string',
             'status' => 'nullable',
             'show_title' => 'boolean',
             'order' => 'nullable|numeric',
-            'lang' => 'required|string',
-            'content' => 'nullable|string'
+            'rules' => 'nullable'
         ]);
 
         // new module
         $module->update([
-            'name' => $data['name'], 
+            'name' => $data['name'],
             'position' => $data['position'] ?? '',
             'state' => $data['status'],
             'show_title' => $data['show_title'] ?? 0,
             'order' => $data['order'],
             'created_by' => 5,
-            'rules' => ''
+            'rules' => $data['rules'] ?? ''
         ]);
-
-        // Module Translation
-        $module->translations()->first()->update([
-            'lang' => $data['lang'],
-            'title' => $data['title'],
-            'content'   => $data['content'],
-        ]);
-
-        // module Rules
-        // $moduleRules = $module->modulerules()->create([
-        //     'show' => 1,
-        //     'type' => 'all'
-        // ]);
 
         return $this->sendResponse($module, 'New Module has been updated!');
     }
@@ -205,22 +193,37 @@ class AdminModuleController extends ApiController
         return $this->sendResponse(null, 'Module has been deleted!');
     }
 
-    public function publish (Module $module)
+    public function publish(Module $module)
     {
-        if ( $module->state == 0 ) {
+        if ($module->state == 0) {
             $module->state = 1;
             $message = 'Votre module a été publié';
-        }
-        elseif ( $module->state == 1 ) {
+        } elseif ($module->state == 1) {
             $module->state = 0;
             $module->save();
             $message = 'Votre module a été dépublié';
-        } elseif ( $module->state == 2 ) {
+        } elseif ($module->state == 2) {
             $module->state = 1;
             $message = 'Votre module a été publié';
         }
         $module->save();
 
         return $this->sendResponse($module, $message);
+    }
+
+    public function updateTranslation(Request $request, ModuleTranslations $translation)
+    {
+        $rules = array('title' => 'required');
+        $validation = Validator::make($request->all(), $rules);
+        if ($validation->fails()) {
+            return $this->sendError('Form Errors !', $validation->errors());
+        }
+        /*Table Modules_translations*/
+        $translation->update([
+            'title' => $request->input('title'),
+            'content' => $request->input('content'),
+        ]);
+
+        return $this->sendResponse($translation, 'La traduction du module a été modifiée');
     }
 }

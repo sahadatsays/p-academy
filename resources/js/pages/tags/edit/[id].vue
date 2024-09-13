@@ -45,11 +45,7 @@ const getEditData = async (id) => {
     per_page: tag.per_page,
     rules: tag.rules,
     sort_by: tag.sort_by,
-    view_name: tag.view_name,
-    // content1: translation.content1 == "" ? null : translation.content1,
-    // content2: translation.content2 == "" ? null : translation.content2,
-    // lang: translation.lang,
-    // title: translation.title,
+    view_name: tag.view_name
   };
   langsTagsForm.value = translations;
   form.value = data;
@@ -212,7 +208,6 @@ onMounted(() => {
               <VRow>
                 <!-- 👉 language -->
                 <VCol cols="12" md="2">
-                
                   <AppSelect
                     v-model="translation.lang"
                     label="Languages"

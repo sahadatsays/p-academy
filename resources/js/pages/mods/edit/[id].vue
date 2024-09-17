@@ -1,14 +1,24 @@
 <!-- eslint-disable camelcase -->
 <script setup>
-import TranslationEdit from '../../../components/TranslationEdit.vue';
-
+import { reactive } from "vue";
+import TranslationEdit from "../../../components/TranslationEdit.vue";
+import DisplayRulesRow from "@/components/DisplayRulesRow.vue";
 
 const form = ref({
   status: 0,
   lang: "fr_FR",
   position: "",
-  rules: ''
+  rules: "",
 });
+
+const rulesRow = reactive([
+  {
+    display: 0,
+    type: "",
+    ids: [],
+    withChild: false,
+  },
+]);
 
 const langs = ref([]);
 const route = useRoute("mods-edit-id");
@@ -38,9 +48,9 @@ const statusList = [
 ];
 
 const ruleList = [
-    {title: 'Public', value: ''},
-    {title: 'Admin', value: 'admin'},
-    {title: 'Member', value: 'member'},
+  { title: "Public", value: "" },
+  { title: "Admin", value: "admin" },
+  { title: "Member", value: "member" },
 ];
 
 const positionList = [
@@ -88,11 +98,6 @@ const submitForm = async () => {
   errors.value = {};
   successMessage.value = response.message;
   hasSuccess.value = response.success;
-};
-
-const updateTranslation = async (translationId) => {
-  console.log('Translation id ', translationId);
-  
 };
 
 const getEditData = async (id) => {
@@ -221,14 +226,33 @@ onMounted(() => {
                   />
                 </VCol>
               </VRow>
-              <VBtn type="submit" variant="flat"> Update </VBtn>
+              <v-divider class="my-4" />
+              <VRow>
+                <VCol cols="12" md="4" class="flex">
+                  <v-select
+                    :model-value="1"
+                    :items="[
+                      { label: 'Show', value: 1 },
+                      { label: 'Hide', value: 0 },
+                    ]"
+                    item-title="label"
+                    item-value="value"
+                  ></v-select>
+                </VCol>
+                <VCol cols="12" md="6">
+                  <span>On all pages</span>
+                </VCol>
+              </VRow>
+              <v-divider class="my-3" />
+              <DisplayRulesRow v-for="(row, index) in rulesRow" :key="index" :form-row="row" />
+              <VBtn type="submit" variant="flat" class="mt-5"> Update </VBtn>
             </VForm>
           </VWindowItem>
           <VWindowItem
             v-for="(translation, index) in moduleTranslationList"
             :value="translation.lang"
           >
-          <TranslationEdit :translation="translation" :key="index"/>
+            <TranslationEdit :translation="translation" :key="index" />
           </VWindowItem>
         </VWindow>
       </VCardText>

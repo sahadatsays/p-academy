@@ -56,6 +56,7 @@ declare module 'vue-router/auto/routes' {
     'mods': RouteRecordInfo<'mods', '/mods', Record<never, never>, Record<never, never>>,
     'mods-create': RouteRecordInfo<'mods-create', '/mods/create', Record<never, never>, Record<never, never>>,
     'mods-edit-id': RouteRecordInfo<'mods-edit-id', '/mods/edit/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
+    'mods-edit-translation-edit': RouteRecordInfo<'mods-edit-translation-edit', '/mods/edit/TranslationEdit', Record<never, never>, Record<never, never>>,
     'pa-tags': RouteRecordInfo<'pa-tags', '/pa-tags', Record<never, never>, Record<never, never>>,
     'pa-tags-create': RouteRecordInfo<'pa-tags-create', '/pa-tags/create', Record<never, never>, Record<never, never>>,
     'pa-tags-edit-id': RouteRecordInfo<'pa-tags-edit-id', '/pa-tags/edit/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,

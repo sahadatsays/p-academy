@@ -7,7 +7,9 @@ use App\Http\Controllers\Api\ApiController;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MenuResource;
 use App\Models\Menu;
+use App\Models\MenuTranslations;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class AdminMenuController extends ApiController
 {
@@ -154,7 +156,7 @@ class AdminMenuController extends ApiController
         }
 
         $result['menu'] = new MenuResource($menu);
-        $result['translation'] = $menu->translations()->first();
+        $result['translations'] = $menu->translations;
 
         return $this->sendResponse($result, 'Edit data');
     }
@@ -171,8 +173,6 @@ class AdminMenuController extends ApiController
 
         $data = $request->validate([
             'name' => 'required|string|max:200',
-            'title' => 'required|string',
-            'lang' => 'required|string',
             'parent_id' => 'required',
             'url_externe' => 'nullable',
             'target_blank' => 'boolean',
@@ -200,12 +200,6 @@ class AdminMenuController extends ApiController
             'rules'         => ''
         ]);
 
-        // menu translation
-        $menu->translations()->first()->update([
-            'lang' => $data['lang'],
-            'title' => $data['title'],
-        ]);
-
         return $this->sendResponse(new MenuResource($menu), 'Menu has been updated!');
     }
 
@@ -223,4 +217,20 @@ class AdminMenuController extends ApiController
         $menu->delete();
         return $this->sendResponse(null, 'Menu has been deleted');
     }
+
+    public function updateTranslation(Request $request, MenuTranslations $translation)
+    {
+        $rules = array('title' => 'required');
+        $validation = Validator::make($request->all(), $rules);
+        if ($validation->fails()) {
+            return $this->sendError('Form Errors !', $validation->errors());
+        }
+        /*Table Menu Translation */
+        $translation->update([
+            'title' => $request->input('title')
+        ]);
+
+        return $this->sendResponse($translation, 'La traduction du module a été modifiée');
+    }
+
 }

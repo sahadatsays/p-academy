@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Language;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -15,12 +16,17 @@ class MenuResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $lang = $this->translations()->first()->lang ?? '';
+        if ($lang) {
+            $lang = Language::where('default_locale', $lang)->first()->english_name ?? '';
+        }
         return [
             'id'            => $this->id,
             'name'          => $this->name,
             'order'         => $this->order,
             'parent'        => new MenuResource($this->parent),
             'url'           => $this->url_externe,
+            'translation'   => $lang,
             'targetBlank'   => $this->target_blank ? true : false,
             'status'        => $this->state,
             'obfuscate'        => $this->obfuscate ? true : false,

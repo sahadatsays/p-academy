@@ -19,7 +19,7 @@ const translationForm = ref({
 });
 
 const updateTranslation = async (translationId) => {
-  const res = await $api(`/admin/modules/translation/update/${translationId}`, {
+  const res = await $api(`/admin/menus/translation/${translationId}`, {
     method: 'put',
     body: translationForm.value,
     onResponseError({ response }) {
@@ -49,25 +49,12 @@ const updateTranslation = async (translationId) => {
     <VForm @submit.prevent="updateTranslation(translationForm.id)">
       <VRow>
         <!-- 👉 Name -->
-        <VCol cols="12" md="6">
+        <VCol cols="12" md="12">
           <AppTextField
             v-model="translationForm.title"
             label="Title"
             placeholder="Title"
             :error-messages="errors.title"
-          />
-        </VCol>
-
-        <!-- Content 1 -->
-        <VCol cols="12">
-          <VLabel class="mb-2"> Content </VLabel>
-          <TiptapEditor
-            v-model="translationForm.content"
-            :model-value="translationForm.content"
-            label="Content"
-            placeholder="Write Content"
-            class="border rounded"
-            :error-messages="errors.content"
           />
         </VCol>
       </VRow>

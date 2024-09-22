@@ -45,6 +45,11 @@ const headers = [
     key: 'status',
   },
   {
+    title: 'Translation',
+    key: 'translation',
+    sortable: false,
+  },
+  {
     title: 'Created At',
     key: 'createdAt',
   },

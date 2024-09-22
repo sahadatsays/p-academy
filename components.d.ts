@@ -52,6 +52,7 @@ declare module 'vue' {
     ErrorHeader: typeof import('./resources/js/components/ErrorHeader.vue')['default']
     I18n: typeof import('./resources/js/@core/components/I18n.vue')['default']
     Informations: typeof import('./resources/js/components/members/Informations.vue')['default']
+    MenuTranslateEdit: typeof import('./resources/js/components/MenuTranslateEdit.vue')['default']
     MoreBtn: typeof import('./resources/js/@core/components/MoreBtn.vue')['default']
     Notifications: typeof import('./resources/js/@core/components/Notifications.vue')['default']
     Payment: typeof import('./resources/js/components/members/Payment.vue')['default']

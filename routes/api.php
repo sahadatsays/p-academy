@@ -30,6 +30,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'api'], function () {
         Route::resource('users', App\Http\Controllers\Api\AdminUserController::class)->except(['create', 'destroy', 'show']);
         Route::resource('articles', App\Http\Controllers\Api\AdminArticleController::class)->except(['create', 'show']);
         Route::resource('tags', App\Http\Controllers\Api\AdminTagController::class)->except(['create', 'show']);
+        Route::put('menus/translation/{translation}', [App\Http\Controllers\Api\AdminMenuController::class, 'updateTranslation']);
         Route::resource('menus', App\Http\Controllers\Api\AdminMenuController::class)->except(['create', 'show']);
         Route::put('modules/translation/update/{translation}', [App\Http\Controllers\Api\AdminModuleController::class, 'updateTranslation']);
         Route::get('modules/publish/{module}', [App\Http\Controllers\Api\AdminModuleController::class, 'publish']);

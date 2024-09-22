@@ -68,8 +68,6 @@ const fetchMenus = async () => {
 
 const fetchUrls = async () => {
   const res = await $api('/admin/fetch/urls')
-
-  console.log(res)
   parentUrlsList.value = res.data
 }
 

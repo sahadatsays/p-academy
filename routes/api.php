@@ -36,6 +36,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'api'], function () {
         Route::resource('modules', App\Http\Controllers\Api\AdminModuleController::class)->except(['create', 'show']);
         Route::resource('patags', App\Http\Controllers\Api\AdminPATagController::class)->except(['create', 'show']);
         Route::resource('siteurls', App\Http\Controllers\Api\AdminURLSiteController::class)->except(['create', 'edit', 'show']);
+        Route::resource('url-301', App\Http\Controllers\Api\AdminUrl301Controller::class)->except(['create', 'edit', 'show']);
+        Route::get('siteurls-404', [App\Http\Controllers\Api\AdminUrl404Controller::class, 'index']);
 
         /**
          * Data Fetching For select options
@@ -47,6 +49,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'api'], function () {
         Route::get('fetch/langs', [App\Http\Controllers\Api\AdminFetchData::class, 'fetchLanguages'])->name('fetch.langs');
         Route::get('fetch/menus', [App\Http\Controllers\Api\AdminFetchData::class, 'fetchMenus'])->name('fetch.menus');
         Route::get('fetch/urls', [App\Http\Controllers\Api\AdminFetchData::class, 'fetchUrls'])->name('fetch.urls');
+        Route::get('fetch/site/urls', [App\Http\Controllers\Api\AdminFetchData::class, 'fetchSiteUrls'])->name('fetch.site.urls');
     });
 });
 

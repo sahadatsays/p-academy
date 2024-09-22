@@ -48,7 +48,7 @@ export default [
       },
       {
         title: 'SEO',
-        to: { name: 'site-urls' },
+        to: { name: 'urls' },
       },
       {
         title: 'Menus',

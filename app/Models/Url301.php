@@ -14,6 +14,6 @@ class Url301 extends Model
 
        public function urlsite()
     {
-       return $this->belongsTo(Urlsite::class);     
+       return $this->belongsTo(Urlsite::class)->withDefault(); 
     }
 }

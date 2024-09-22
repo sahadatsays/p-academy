@@ -19,6 +19,7 @@ class URLSiteResource extends JsonResource
             'id'            => $this->id,
             'url'           => env('APP_URL') . $this->url,
             'hits'          => $this->hits,
+            'type'          => $this->linkto_type,
             'createdAt'     => Carbon::parse($this->created_at)->toDateTimeString()
         ];
     }

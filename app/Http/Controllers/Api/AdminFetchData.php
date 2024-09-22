@@ -14,6 +14,7 @@ use App\Models\Operator;
 use App\Models\Patag;
 use App\Models\Tag;
 use App\Models\TagTranslations;
+use App\Models\Urlsite;
 use Illuminate\Http\Request;
 
 class AdminFetchData extends ApiController
@@ -68,6 +69,17 @@ class AdminFetchData extends ApiController
         }
 
         return $this->sendResponse($options, 'fetch');
+    }
+
+    public function fetchSiteUrls(Request $request) 
+    {
+        if($request->search) {
+            $searchResult = Urlsite::select('id', 'url')->where('url', 'LIKE', '%' . $request->search . '%')->limit(50)->get();
+           if (count($searchResult) > 0) {
+            return $searchResult;
+           }
+        }
+        return Urlsite::select('id', 'url')->inRandomOrder()->limit(50)->get();
     }
 
 }

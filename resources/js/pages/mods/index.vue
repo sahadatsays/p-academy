@@ -1,19 +1,19 @@
 <script setup>
-const options = ref({});
+const options = ref({})
 
-const dataList = ref([]);
-const totalData = ref(0);
-const loading = ref(false);
-const perPage = ref(0);
-const search = ref("");
+const dataList = ref([])
+const totalData = ref(0)
+const loading = ref(false)
+const perPage = ref(0)
+const search = ref("")
 const successMessage = ref('')
-const hasSuccess = ref(false);
+const hasSuccess = ref(false)
 
 const confirmAlert = ref({
   confirm: false,
   actionUrl: "",
   redirect: "",
-});
+})
 
 // headers
 const headers = [
@@ -58,46 +58,46 @@ const headers = [
     key: "actions",
     sortable: false,
   },
-];
+]
 
 const fetchData = async () => {
-  loading.value = true;
+  loading.value = true
 
   const response = await $api("/admin/modules", {
     query: options.value,
     onResponseError({ response }) {
-      console.log(response);
+      console.log(response)
     },
-  });
+  })
 
   // assign Response
-  dataList.value = response.data;
-  totalData.value = response.meta.total;
-  perPage.value = response.meta.per_page;
-  loading.value = false;
-};
+  dataList.value = response.data
+  totalData.value = response.meta.total
+  perPage.value = response.meta.per_page
+  loading.value = false
+}
 
-const deleteAction = (id) => {
+const deleteAction = id => {
   confirmAlert.value = {
     confirm: true,
     actionUrl: `/admin/modules/${id}`,
-  };
-};
+  }
+}
 
-const changeStatus = async (id) => {
+const changeStatus = async id => {
   const res = await $api(`/admin/modules/publish/${id}`, {
     onResponseError({ response }) {
-      console.log(response);
+      console.log(response)
     },
-  });
+  })
 
   successMessage.value = res.message
   hasSuccess.value = res.success
 
   fetchData()
-};
+}
 
-watch(options, fetchData, { deep: true });
+watch(options, fetchData, { deep: true })
 </script>
 
 <template>
@@ -121,15 +121,28 @@ watch(options, fetchData, { deep: true });
     <VCard title="Modules">
       <VCardText>
         <VRow>
-          <VCol cols="12" md="2">
+          <VCol
+            cols="12"
+            md="2"
+          >
             <div>
-              <VBtn block :to="{ name: 'mods-create' }">
-                <VIcon icon="tabler-plus" start />
+              <VBtn
+                block
+                :to="{ name: 'mods-create' }"
+              >
+                <VIcon
+                  icon="tabler-plus"
+                  start
+                />
                 New Module
               </VBtn>
             </div>
           </VCol>
-          <VCol cols="12" offset-md="6" md="4">
+          <VCol
+            cols="12"
+            offset-md="6"
+            md="4"
+          >
             <AppTextField
               v-model="search"
               placeholder="Search ..."
@@ -188,7 +201,7 @@ watch(options, fetchData, { deep: true });
           <div>
             <VCheckbox
               :model-value="item.status ? true : false"
-              @update:modelValue="changeStatus(item.id)"
+              @update:model-value="changeStatus(item.id)"
             />
           </div>
         </template>

@@ -3,7 +3,7 @@ import  UrlSites  from '@/views/pages/urls/urlSites.vue'
 import  Alias301  from '@/views/pages/urls/Alias301.vue'
 import  Errors404  from '@/views/pages/urls/Errors404.vue'
 
-const currentTab = ref("url-sites");
+const currentTab = ref("url-sites")
 </script>
 
 <template>
@@ -17,15 +17,15 @@ const currentTab = ref("url-sites");
 
       <VCardText>
         <VWindow v-model="currentTab">
-            <VWindowItem value="url-sites">
-               <UrlSites />
-            </VWindowItem>
-            <VWindowItem value="alias-301">
-                <Alias301 />
-            </VWindowItem>
-            <VWindowItem value="errors-404">
-                <Errors404 />
-            </VWindowItem>
+          <VWindowItem value="url-sites">
+            <UrlSites />
+          </VWindowItem>
+          <VWindowItem value="alias-301">
+            <Alias301 />
+          </VWindowItem>
+          <VWindowItem value="errors-404">
+            <Errors404 />
+          </VWindowItem>
         </VWindow>
       </VCardText>
     </VCard>

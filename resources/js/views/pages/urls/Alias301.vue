@@ -1,29 +1,29 @@
 <script setup>
-const options = ref({});
+const options = ref({})
 
-const dataList = ref([]);
-const totalData = ref(0);
-const loading = ref(false);
-const perPage = ref(0);
-const search = ref("");
+const dataList = ref([])
+const totalData = ref(0)
+const loading = ref(false)
+const perPage = ref(0)
+const search = ref("")
 
 const confirmAlert = ref({
   confirm: false,
   actionUrl: "",
   redirect: "",
-});
+})
 
 // headers
 const headers = [
   {
     title: "Alias",
     key: "alias",
-    width: '500px'
+    width: '500px',
   },
   {
     title: "URL",
     key: "url",
-    width: '500px'
+    width: '500px',
   },
   {
     title: "Reason",
@@ -46,26 +46,26 @@ const headers = [
     key: "actions",
     sortable: false,
   },
-];
+]
 
 const fetchData = async () => {
-  loading.value = true;
+  loading.value = true
 
   const response = await $api("/admin/url-301", {
     query: options.value,
     onResponseError({ response }) {
-      console.log(response);
+      console.log(response)
     },
-  });
+  })
 
   // assign Response
-  dataList.value = response.data;
-  totalData.value = response.meta.total;
-  perPage.value = response.meta.per_page;
-  loading.value = false;
-};
+  dataList.value = response.data
+  totalData.value = response.meta.total
+  perPage.value = response.meta.per_page
+  loading.value = false
+}
 
-watch(options, fetchData, { deep: true });
+watch(options, fetchData, { deep: true })
 
 const deleteAction =  id => {
   confirmAlert.value = {
@@ -85,13 +85,20 @@ const deleteAction =  id => {
     />
 
     <VRow>
-        <VCol cols="12" md="2">
-            <VBtn :to="{ name: 'urls-create'}">
-                <VIcon icon="tabler-plus"></VIcon>
-                Add Alias
-            </VBtn>
-        </VCol>
-      <VCol cols="12" offset-md="6" md="4">
+      <VCol
+        cols="12"
+        md="2"
+      >
+        <VBtn :to="{ name: 'urls-create'}">
+          <VIcon icon="tabler-plus" />
+          Add Alias
+        </VBtn>
+      </VCol>
+      <VCol
+        cols="12"
+        offset-md="6"
+        md="4"
+      >
         <AppTextField
           v-model="search"
           density="compact"
@@ -149,14 +156,20 @@ const deleteAction =  id => {
     <!-- Alias -->
     <template #item.alias="{ item }">
       <div class="d-flex align-center">
-        <a :href="item.alias" target="__blank">{{ item.alias }}</a>
+        <a
+          :href="item.alias"
+          target="__blank"
+        >{{ item.alias }}</a>
       </div>
     </template>
 
     <!-- URL -->
     <template #item.url="{ item }">
       <div class="d-flex align-center">
-        <a :href="item.url" target="__blank">{{ item.url }}</a>
+        <a
+          :href="item.url"
+          target="__blank"
+        >{{ item.url }}</a>
       </div>
     </template>
 

@@ -90,7 +90,6 @@ const deleteAction =  id => {
     actionUrl: `/admin/tags/${id}`,
   }
 }
-
 </script>
 
 <template>
@@ -188,7 +187,10 @@ const deleteAction =  id => {
               <VIcon icon="tabler-pencil" />
             </IconBtn>
             <IconBtn>
-              <VIcon icon="tabler-square-x" @click="deleteAction(item.id)"/>
+              <VIcon
+                icon="tabler-square-x"
+                @click="deleteAction(item.id)"
+              />
             </IconBtn>
           </div>
         </template>

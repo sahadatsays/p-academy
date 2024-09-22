@@ -1,28 +1,28 @@
 <script setup>
-const options = ref({});
+const options = ref({})
 
-const dataList = ref([]);
-const totalData = ref(0);
-const loading = ref(false);
-const perPage = ref(0);
-const search = ref("");
+const dataList = ref([])
+const totalData = ref(0)
+const loading = ref(false)
+const perPage = ref(0)
+const search = ref("")
 
 const confirmAlert = ref({
   confirm: false,
   actionUrl: "",
   redirect: "",
-});
+})
 
 // headers
 const headers = [
   {
     title: "URL",
     key: "url",
-    width: '500px'
+    width: '500px',
   },
   {
     title: "Type",
-    key: "type"
+    key: "type",
   },
   {
     title: "Hit",
@@ -37,33 +37,33 @@ const headers = [
     key: "actions",
     sortable: false,
   },
-];
+]
 
 const fetchData = async () => {
-  loading.value = true;
+  loading.value = true
 
   const response = await $api("/admin/siteurls", {
     query: options.value,
     onResponseError({ response }) {
-      console.log(response);
+      console.log(response)
     },
-  });
+  })
 
   // assign Response
-  dataList.value = response.data;
-  totalData.value = response.meta.total;
-  perPage.value = response.meta.per_page;
-  loading.value = false;
-};
+  dataList.value = response.data
+  totalData.value = response.meta.total
+  perPage.value = response.meta.per_page
+  loading.value = false
+}
 
-const deleteAction = (id) => {
+const deleteAction = id => {
   confirmAlert.value = {
     confirm: true,
     actionUrl: `/admin/siteurls/${id}`,
-  };
-};
+  }
+}
 
-watch(options, fetchData, { deep: true });
+watch(options, fetchData, { deep: true })
 </script>
 
 <template>
@@ -76,7 +76,11 @@ watch(options, fetchData, { deep: true });
     />
 
     <VRow>
-      <VCol cols="12" offset-md="8" md="4">
+      <VCol
+        cols="12"
+        offset-md="8"
+        md="4"
+      >
         <AppTextField
           v-model="search"
           density="compact"
@@ -123,7 +127,10 @@ watch(options, fetchData, { deep: true });
     <!-- URL -->
     <template #item.url="{ item }">
       <div class="d-flex align-center">
-        <a :href="item.url" target="__blank">{{ item.url }}</a>
+        <a
+          :href="item.url"
+          target="__blank"
+        >{{ item.url }}</a>
       </div>
     </template>
 

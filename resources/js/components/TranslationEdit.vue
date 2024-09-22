@@ -4,44 +4,52 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-});
+})
 
-const errors = ref([]);
-const hasError = ref(false);
-const error = ref("");
-const successMessage = ref("");
-const hasSuccess = ref(false);
+const errors = ref([])
+const hasError = ref(false)
+const error = ref("")
+const successMessage = ref("")
+const hasSuccess = ref(false)
 
 const translationForm = ref({
   id: props.translation.id,
   title: props.translation.title,
   content: props.translation.content,
-});
+})
 
-const updateTranslation = async (translationId) => {
+const updateTranslation = async translationId => {
   const res = await $api(`/admin/modules/translation/update/${translationId}`, {
     method: 'put',
     body: translationForm.value,
     onResponseError({ response }) {
-      errors.value = response._data.data;
-      error.value = response._data.message;
-      hasError.value = true;
+      errors.value = response._data.data
+      error.value = response._data.message
+      hasError.value = true
     },
-  });
+  })
 
-  successMessage.value = res.message;
-  hasSuccess.value = res.success;
-};
+  successMessage.value = res.message
+  hasSuccess.value = res.success
+}
 </script>
 
 <template>
   <div>
-    <VSnackbar v-model="hasSuccess" location="top end" color="success">
+    <VSnackbar
+      v-model="hasSuccess"
+      location="top end"
+      color="success"
+    >
       <VIcon icon="tabler-exclamation-circle" />
       {{ successMessage }}
     </VSnackbar>
 
-    <VSnackbar v-model="hasError" location="top end" color="error">
+    <VSnackbar
+      v-model="hasError"
+      location="top end"
+      color="error"
+    >
       <VIcon icon="tabler-exclamation-circle" />
       {{ error }}
     </VSnackbar>
@@ -49,7 +57,10 @@ const updateTranslation = async (translationId) => {
     <VForm @submit.prevent="updateTranslation(translationForm.id)">
       <VRow>
         <!-- 👉 Name -->
-        <VCol cols="12" md="6">
+        <VCol
+          cols="12"
+          md="6"
+        >
           <AppTextField
             v-model="translationForm.title"
             label="Title"
@@ -60,7 +71,9 @@ const updateTranslation = async (translationId) => {
 
         <!-- Content 1 -->
         <VCol cols="12">
-          <VLabel class="mb-2"> Content </VLabel>
+          <VLabel class="mb-2">
+            Content
+          </VLabel>
           <TiptapEditor
             v-model="translationForm.content"
             :model-value="translationForm.content"
@@ -71,7 +84,12 @@ const updateTranslation = async (translationId) => {
           />
         </VCol>
       </VRow>
-      <VBtn type="submit" class="mt-4">Update</VBtn>
+      <VBtn
+        type="submit"
+        class="mt-4"
+      >
+        Update
+      </VBtn>
     </VForm>
   </div>
 </template>

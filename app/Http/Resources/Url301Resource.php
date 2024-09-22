@@ -21,6 +21,7 @@ class Url301Resource extends JsonResource
             'hits' => $this->hits,
             'reason' => $this->reason,
             'url' => env('APP_URL') . $this->urlsite->url,
+            'url_id' => $this->urlsite->id,
             'visit_at' => Carbon::parse($this->visit_at)->toDateTimeString(),
             'bot_visit' => $this->botvisit_at === "0000-00-00 00:00:00" ? 'Never' : Carbon::parse($this->botvisit_visit)->toDateTimeString()
         ];

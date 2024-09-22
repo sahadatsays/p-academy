@@ -106,7 +106,8 @@ class AdminUrl301Controller extends ApiController
      */
     public function edit(string $id)
     {
-        //
+        $url = Url301::findOrFail($id);
+        return $url;
     }
 
     /**
@@ -114,7 +115,25 @@ class AdminUrl301Controller extends ApiController
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'alias' => 'required|string',
+            'urlsite_id' => 'required',
+            'reason' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Form validation error.', $validator->errors(), 422);
+        }
+        $url = Url301::findOrFail($id);
+
+        $url->update([
+            'urlsite_id' => $request->urlsite_id,
+            'reason' => $request->reason,
+            'alias' => $request->alias
+        ]);
+
+        return $this->sendResponse($url, 'L\'alias a été modifié');
+
     }
 
     /**

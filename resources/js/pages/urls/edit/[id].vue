@@ -10,6 +10,7 @@ const hasError = ref(false);
 const error = ref("");
 const successMessage = ref("");
 const hasSuccess = ref(false);
+const route = useRoute("urls-edit-id");
 
 const submitForm = async () => {
   const response = await $api(`/admin/url-301/${route.params.id}`, {
@@ -25,7 +26,7 @@ const submitForm = async () => {
   errors.value = {};
   successMessage.value = response.message;
   hasSuccess.value = response.success;
-  form.value = {};
+//   form.value = {};
 };
 
 const fetchUrls = async () => {
@@ -34,8 +35,20 @@ const fetchUrls = async () => {
   urlList.value = response ?? [];
 };
 
+const getEditData = async () => {
+    const response = await $api(`/admin/url-301/${route.params.id}/edit`);
+    const formData = {
+        alias: response.alias,
+        reason: response.reason,
+        urlsite_id: response.url_id,
+    }
+
+    form.value = formData
+}
+
 onMounted(() => {
     fetchUrls()
+    getEditData()
 });
 </script>
 
@@ -115,7 +128,7 @@ onMounted(() => {
             </VCol>
 
             <VCol cols="12" class="d-flex gap-4 justify-end">
-              <VBtn type="submit"> Save </VBtn>
+              <VBtn type="submit">Update</VBtn>
             </VCol>
           </VRow>
         </VForm>

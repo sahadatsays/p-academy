@@ -4,7 +4,6 @@ const form = ref({});
 const langsTagsForm = ref([])
 const langs = ref([]);
 const route = useRoute("tags-edit-id");
-const router = useRouter();
 
 const parentTags = ref([]);
 const errors = ref([]);
@@ -13,7 +12,6 @@ const error = ref("");
 const successMessage = ref("");
 const hasSuccess = ref(false);
 const currentTab = ref("properties");
-const tagsTranslations = ref([]);
 
 const submitForm = async () => {
   const response = await $api(`/admin/tags/${route.params.id}`, {

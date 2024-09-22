@@ -36,7 +36,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'api'], function () {
         Route::resource('modules', App\Http\Controllers\Api\AdminModuleController::class)->except(['create', 'show']);
         Route::resource('patags', App\Http\Controllers\Api\AdminPATagController::class)->except(['create', 'show']);
         Route::resource('siteurls', App\Http\Controllers\Api\AdminURLSiteController::class)->except(['create', 'edit', 'show']);
-        Route::resource('url-301', App\Http\Controllers\Api\AdminUrl301Controller::class)->except(['create', 'edit', 'show']);
+        Route::resource('url-301', App\Http\Controllers\Api\AdminUrl301Controller::class)->except(['create', 'show']);
         Route::get('siteurls-404', [App\Http\Controllers\Api\AdminUrl404Controller::class, 'index']);
 
         /**

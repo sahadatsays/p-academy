@@ -166,7 +166,7 @@ const deleteAction =  id => {
         <IconBtn>
           <VIcon icon="tabler-eye" />
         </IconBtn>
-        <IconBtn>
+        <IconBtn :to="{ name: 'urls-edit-id', params: { id: item.id } }">
           <VIcon icon="tabler-edit" />
         </IconBtn>
         <IconBtn @click="deleteAction(item.id)">
